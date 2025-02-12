@@ -464,6 +464,19 @@ public class GlobalFunctions : MonoBehaviour
         if ((PlayState.generalData.paletteFilterState && !paletteShader.enabled) || (!PlayState.generalData.paletteFilterState && paletteShader.enabled))
             paletteShader.enabled = !paletteShader.enabled;
 
+        // Weapon icon positioning
+        for (int i = 0; i < weaponIcons.Length; i++)
+        {
+            string iconState = weaponIcons[i].currentAnimName.Split('_')[2];
+            Transform iconPos = weaponIcons[i].transform;
+            float targetY = 0f;
+            if (iconState == "locked" || PlayState.gameState == PlayState.GameState.menu)
+                targetY = -1f;
+            else if (iconState == "inactive")
+                targetY = -0.25f;
+            iconPos.localPosition = Vector2.Lerp(iconPos.localPosition, new(iconPos.localPosition.x, targetY), 15f * Time.deltaTime);
+        }
+
         // Music
         foreach (AudioSource audio in PlayState.musicSourceArray)
             audio.volume = musicMuted ? 0 : Mathf.Lerp(audio.volume, (PlayState.generalData.musicVolume * 0.1f) * PlayState.fader, 5 * Time.deltaTime);
@@ -941,8 +954,44 @@ public class GlobalFunctions : MonoBehaviour
         UpdateWeaponIcons();
     }
 
+    public void ToggleWeapon(int weaponID)
+    {
+        byte[] bitwiseIDs = new byte[] { 1, 2, 4, 8 };
+        if (PlayState.allowStackingWeapons)
+        {
+            if ((PlayState.playerScript.selectedWeapon & bitwiseIDs[weaponID]) == bitwiseIDs[weaponID])
+                PlayState.playerScript.selectedWeapon -= bitwiseIDs[weaponID];
+            else
+                PlayState.playerScript.selectedWeapon += bitwiseIDs[weaponID];
+        }
+        else
+            PlayState.playerScript.selectedWeapon = bitwiseIDs[weaponID];
+        UpdateWeaponIcons();
+    }
+
+    public void BatchToggleWeapon(int weaponIDs)
+    {
+        PlayState.playerScript.selectedWeapon = weaponIDs;
+        UpdateWeaponIcons();
+    }
+
+    public void ActivateWeapon(int weaponID)
+    {
+        byte[] bitwiseIDs = new byte[] { 1, 2, 4, 8 };
+        if ((PlayState.playerScript.selectedWeapon & bitwiseIDs[weaponID]) == 0)
+            ToggleWeapon(weaponID);
+    }
+
+    public void DeactivateWeapon(int weaponID)
+    {
+        byte[] bitwiseIDs = new byte[] { 1, 2, 4, 8 };
+        if ((PlayState.playerScript.selectedWeapon & bitwiseIDs[weaponID]) == bitwiseIDs[weaponID])
+            ToggleWeapon(weaponID);
+    }
+
     public void UpdateWeaponIcons()
     {
+        byte bitwiseID = 1;
         for (int i = 0; i < weaponIcons.Length; i++)
         {
             string animName = "WeaponIcon_" + i + "_";
@@ -956,7 +1005,8 @@ public class GlobalFunctions : MonoBehaviour
             } && !PlayState.trapManager.lockedWeapons.Contains(i);
             if (i == 0)
                 weaponIcons[i].GetSpriteRenderer().enabled = PlayState.isRandomGame && PlayState.currentRando.broomStart;
-            if (PlayState.playerScript.selectedWeapon == i && hasWeapon)
+            //if (PlayState.playerScript.selectedWeapon == i && hasWeapon)
+            if (hasWeapon && ((PlayState.playerScript.selectedWeapon & bitwiseID) == bitwiseID))
                 animName += "active";
             else if (hasWeapon)
                 animName += "inactive";
@@ -964,6 +1014,7 @@ public class GlobalFunctions : MonoBehaviour
                 animName += "locked";
             if (weaponIcons[i].lastAnimName != animName)
                 weaponIcons[i].Play(animName);
+            bitwiseID *= 2;
         }
     }
 
@@ -1389,7 +1440,7 @@ public class GlobalFunctions : MonoBehaviour
                     Control.SetVirtual(Control.Keyboard.Up1, true);
                     if (PlayState.player.transform.position.x - itemOrigin.x > 9.5f)
                     {
-                        ChangeActiveWeapon(3);
+                        ActivateWeapon(3);
                         Control.SetVirtual(Control.Keyboard.Right1, false);
                         Control.SetVirtual(Control.Keyboard.Jump1, true);
                         step++;
@@ -1477,7 +1528,7 @@ public class GlobalFunctions : MonoBehaviour
                     Control.SetVirtual(Control.Keyboard.Down1, true);
                     if (PlayState.player.transform.position.x > itemOrigin.x + 4)
                     {
-                        ChangeActiveWeapon(3);
+                        ActivateWeapon(3);
                         Control.SetVirtual(Control.Keyboard.Down1, false);
                         Control.SetVirtual(Control.Keyboard.Up1, true);
                         step++;
@@ -1558,7 +1609,7 @@ public class GlobalFunctions : MonoBehaviour
                     }
                     if (PlayState.playerScript.transform.position.x > itemOrigin.x + 9.5f)
                     {
-                        ChangeActiveWeapon(3);
+                        ActivateWeapon(3);
                         Control.SetVirtual(Control.Keyboard.Right1, false);
                         step++;
                         stepElapsed = 0;
@@ -1658,7 +1709,7 @@ public class GlobalFunctions : MonoBehaviour
                         Control.SetVirtual(Control.Keyboard.Right1, false);
                     if (PlayState.playerScript.velocity.x == 0 && PlayState.playerScript.grounded && !PlayState.playerScript.ungroundedViaHop)
                     {
-                        ChangeActiveWeapon(3);
+                        ActivateWeapon(3);
                         Control.SetVirtual(Control.Keyboard.Up1, true);
                         step++;
                         stepElapsed = 0;

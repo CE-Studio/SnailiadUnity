@@ -128,9 +128,10 @@ public class PlayState
     public static bool dialogueOpen = false;
     public static bool achievementOpen = false;
     public static bool cutsceneActive = false;
-    public static int lastLoadedWeapon = 0;
+    //public static int lastLoadedWeapon = 0;
     public static bool stackShells = true;
     public static bool stackWeaponMods = true;
+    public static bool allowStackingWeapons = true;
     public static bool suppressPause = false;
     public static bool resetInducingFadeActive = false;
     public static int areaOfDeath = -1;
@@ -536,7 +537,7 @@ public class PlayState
         character = "Snaily",
         items = new int[16],
         locations = new int[57],
-        weapon = -1,
+        weapon = 0,
         bossStates = new int[] { 1, 1, 1, 1 },
         NPCVars = new int[] { 0, 0, 0 },
         percentage = 0,

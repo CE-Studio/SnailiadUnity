@@ -148,7 +148,7 @@ public class Bullet : MonoBehaviour
             Despawn();
     }
 
-    public void Shoot(int type, int dir, bool applyRapidMult, float posOverrideX = Mathf.Infinity, float posOverrideY = Mathf.Infinity)
+    public void Shoot(int type, int dir, bool applyRapidMult, bool applyDev, float posOverrideX = Mathf.Infinity, float posOverrideY = Mathf.Infinity)
     {
         isActive = true;
         sprite.enabled = true;
@@ -199,88 +199,168 @@ public class Bullet : MonoBehaviour
         int lightSize = -1;
         switch (type)
         {
-            case 0: // Broom
-                box.size = new Vector2(2.45f, 2.45f);
-                velocity = 1f;
-                damage = 25;
-                rapidMult = 1f;
-                box.enabled = false;
-                break;
-            case 1: // Devastator Broom
-                box.size = new Vector2(4.95f, 4.95f);
-                velocity = 1f;
-                damage = 80;
-                rapidMult = 1f;
-                box.enabled = false;
-                break;
-            case 2: // Peashooter
-                box.size = new Vector2(0.25f, 0.25f);
-                velocity = 0.4625f;
-                damage = 10;
-                rapidMult = 2f;
-                break;
-            case 3: // Devastator Peashooter
-                box.size = new Vector2(1.4f, 1.4f);
-                velocity = 0.4625f;
-                damage = 45;
-                rapidMult = 2f;
-                break;
-            case 4: // Boomerang
-                box.size = new Vector2(0.9f, 0.9f);
-                velocity = 0.4125f;
-                damage = 20;
-                rapidMult = 2f;
-                despawnOffScreen = false;
-                break;
-            case 5: // Devastator Boomerang
-                box.size = new Vector2(1.4f, 1.4f);
-                velocity = 0.4125f;
-                damage = 50;
-                rapidMult = 2f;
-                despawnOffScreen = false;
-                break;
-            default:
-            case 6: // Rainbow Wave
-                box.size = new Vector2(1.9f, 1.9f);
-                velocity = 0.075f;
-                damage = 30;
-                rapidMult = 2f;
-                lightSize = 13;
-                break;
-            case 7: // Devastator Rainbow Wave
-                box.size = new Vector2(2.4f, 2.4f);
-                velocity = 0.075f;
-                damage = 68;
-                rapidMult = 2f;
-                lightSize = 17;
-                break;
-            case 8: // Gravity Shock
+            //case 0: // Broom
+            //    box.size = new Vector2(2.45f, 2.45f);
+            //    velocity = 1f;
+            //    damage = 25;
+            //    rapidMult = 1f;
+            //    box.enabled = false;
+            //    break;
+            //case 1: // Devastator Broom
+            //    box.size = new Vector2(4.95f, 4.95f);
+            //    velocity = 1f;
+            //    damage = 80;
+            //    rapidMult = 1f;
+            //    box.enabled = false;
+            //    break;
+            //case 2: // Peashooter
+            //    box.size = new Vector2(0.25f, 0.25f);
+            //    velocity = 0.4625f;
+            //    damage = 10;
+            //    rapidMult = 2f;
+            //    break;
+            //case 3: // Devastator Peashooter
+            //    box.size = new Vector2(1.4f, 1.4f);
+            //    velocity = 0.4625f;
+            //    damage = 45;
+            //    rapidMult = 2f;
+            //    break;
+            //case 4: // Boomerang
+            //    box.size = new Vector2(0.9f, 0.9f);
+            //    velocity = 0.4125f;
+            //    damage = 20;
+            //    rapidMult = 2f;
+            //    despawnOffScreen = false;
+            //    break;
+            //case 5: // Devastator Boomerang
+            //    box.size = new Vector2(1.4f, 1.4f);
+            //    velocity = 0.4125f;
+            //    damage = 50;
+            //    rapidMult = 2f;
+            //    despawnOffScreen = false;
+            //    break;
+            //default:
+            //case 6: // Rainbow Wave
+            //    box.size = new Vector2(1.9f, 1.9f);
+            //    velocity = 0.075f;
+            //    damage = 30;
+            //    rapidMult = 2f;
+            //    lightSize = 13;
+            //    break;
+            //case 7: // Devastator Rainbow Wave
+            //    box.size = new Vector2(2.4f, 2.4f);
+            //    velocity = 0.075f;
+            //    damage = 68;
+            //    rapidMult = 2f;
+            //    lightSize = 17;
+            //    break;
+            //case 8: // Gravity Shock
+            //    box.size = new Vector2(2.75f, 2.75f);
+            //    velocity = 0;
+            //    damage = 300;
+            //    rapidMult = 1f;
+            //    despawnOffScreen = false;
+            //    break;
+            //case 9: // Full-Metal Gravity Shock
+            //    box.size = new Vector2(3f, 3f);
+            //    velocity = 0;
+            //    damage = 650;
+            //    rapidMult = 1f;
+            //    despawnOffScreen = false;
+            //    break;
+            //case 10: // Shockwave
+            //    box.size = new Vector2(0.45f, 0.45f);
+            //    velocity = 0.05f;
+            //    damage = 68;
+            //    rapidMult = 1f;
+            //    lightSize = 9;
+            //    break;
+            //case 11: // Devastator Shockwave
+            //    box.size = new Vector2(0.95f, 0.95f);
+            //    velocity = 0.085f;
+            //    damage = 108;
+            //    rapidMult = 1f;
+            //    lightSize = 11;
+            //    break;
+            case -1: // Gravity Shock
                 box.size = new Vector2(2.75f, 2.75f);
                 velocity = 0;
                 damage = 300;
                 rapidMult = 1f;
                 despawnOffScreen = false;
                 break;
-            case 9: // Full-Metal Gravity Shock
+            case -2: // Full-Metal Gravity Shock
                 box.size = new Vector2(3f, 3f);
                 velocity = 0;
                 damage = 650;
                 rapidMult = 1f;
                 despawnOffScreen = false;
                 break;
-            case 10: // Shockwave
+            case -3: // Shockwave
                 box.size = new Vector2(0.45f, 0.45f);
                 velocity = 0.05f;
                 damage = 68;
                 rapidMult = 1f;
                 lightSize = 9;
                 break;
-            case 11: // Devastator Shockwave
+            case -4: // Devastator Shockwave
                 box.size = new Vector2(0.95f, 0.95f);
                 velocity = 0.085f;
                 damage = 108;
                 rapidMult = 1f;
                 lightSize = 11;
+                break;
+            case 1:  // A___ - Vanilla broom
+                box.size =         applyDev ? new(4.95f, 4.95f) : new(2.45f, 2.45f);
+                velocity =         applyDev ? 1f                : 1f;
+                damage =           applyDev ? 80                : 25;
+                rapidMult =        applyDev ? 1f                : 1f;
+                box.enabled =      applyDev ? false             : false;
+                break;
+            case 2:  // _B__ - Vanilla peashooter
+                box.size =         applyDev ? new(1.4f, 1.4f)   : new(0.25f, 0.25f);
+                velocity =         applyDev ? 0.4625f           : 0.4625f;
+                damage =           applyDev ? 45                : 10;
+                rapidMult =        applyDev ? 2f                : 2f;
+                break;
+            case 3:  // AB__ - Vanilla broom with a ranged air slash (at full health?)
+                break;
+            case 4:  // __C_ - Singular boomerang that must return
+                break;
+            case 5:  // A_C_ - Singular tossed broom that must return
+                break;
+            case 6:  // _BC_ - Vanilla boomerang
+                box.size =         applyDev ? new(1.4f, 1.4f)   : new(0.9f, 0.9f);
+                velocity =         applyDev ? 0.4125f           : 0.4125f;
+                damage =           applyDev ? 50                : 20;
+                rapidMult =        applyDev ? 2f                : 2f;
+                despawnOffScreen = applyDev ? false             : false;
+                break;
+            case 7:  // ABC_ - Multiple tossed brooms
+                break;
+            case 8:  // ___D - Single donut
+                break;
+            case 9:  // A__D - 360 broom swipe + rotating donut trio
+                break;
+            case 10: // _B_D - Vanilla rainbow wave + afterimage
+                box.size =         applyDev ? new(2.4f, 2.4f)   : new(1.9f, 1.9f);
+                velocity =         applyDev ? 0.075f            : 0.075f;
+                damage =           applyDev ? 68                : 30;
+                rapidMult =        applyDev ? 2f                : 2f;
+                lightSize =        applyDev ? 17                : 13;
+                break;
+            case 11: // AB_D - 360 Broom swipe + Vanilla rainbow wave + afterimage
+                break;
+            case 12: // __CD - Rainbow boomerang that must return + afterimage
+                break;
+            case 13: // A_CD - 360 Broom swipe + Rainbow broom-erang that must return + afterimage
+                break;
+            case 14: // _BCD - Multiple rainbow boomerangs + afterimage
+                break;
+            case 15: // ABCD - 360 Broom swipe + Multiple rainbow broom-erangs + afterimage
+                break;
+            case 0:  // No equipped weapon
+            default:
                 break;
         }
         direction = dir;

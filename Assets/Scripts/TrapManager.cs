@@ -128,14 +128,21 @@ public class TrapManager : MonoBehaviour
                 if (PlayState.CheckForItem(PlayState.Items.RainbowWave))
                     currentLoadout.Add(3);
                 int weaponCountToLock = Mathf.FloorToInt(currentLoadout.Count * 0.5f);
-                int currentCheckedID = currentLoadout.Count - 1;
-                while (weaponCountToLock > 0 && currentCheckedID >= 0)
+                //int currentCheckedID = currentLoadout.Count - 1;
+                //while (weaponCountToLock > 0 && currentCheckedID >= 0)
+                //{
+                //    lockedWeapons.Add(currentLoadout[currentCheckedID]);
+                //    weaponCountToLock--;
+                //    currentCheckedID--;
+                //    if (weaponCountToLock == 0)
+                //        PlayState.globalFunctions.ChangeActiveWeapon(currentLoadout[currentCheckedID]);
+                //}
+                while (weaponCountToLock > 0)
                 {
-                    lockedWeapons.Add(currentLoadout[currentCheckedID]);
-                    weaponCountToLock--;
-                    currentCheckedID--;
-                    if (weaponCountToLock == 0)
-                        PlayState.globalFunctions.ChangeActiveWeapon(currentLoadout[currentCheckedID]);
+                    int loadoutID = Mathf.FloorToInt(Random.value * currentLoadout.Count);
+                    lockedWeapons.Add(currentLoadout[loadoutID]);
+                    PlayState.globalFunctions.DeactivateWeapon(currentLoadout[loadoutID]);
+                    currentLoadout.RemoveAt(loadoutID);
                 }
                 break;
             case 1:
@@ -179,7 +186,8 @@ public class TrapManager : MonoBehaviour
         {
             case 0:
                 lockedWeapons.Clear();
-                PlayState.globalFunctions.ChangeActiveWeapon(lastSelectedWeapon);
+                //PlayState.globalFunctions.ChangeActiveWeapon(lastSelectedWeapon);
+                PlayState.globalFunctions.BatchToggleWeapon(lastSelectedWeapon);
                 break;
             case 1:
                 lockedGravity = Player.Dirs.None;

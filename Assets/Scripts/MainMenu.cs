@@ -2178,12 +2178,19 @@ public class MainMenu : MonoBehaviour
         PlayState.playerScript.holdingJump = true;
         if (!runIntro)
         {
-            if (PlayState.lastLoadedWeapon != 0)
-                PlayState.globalFunctions.ChangeActiveWeapon(PlayState.lastLoadedWeapon);
-            else
-                PlayState.globalFunctions.ChangeActiveWeapon(PlayState.CheckForItem(PlayState.Items.RainbowWave) ||
-                    PlayState.CheckForItem(PlayState.Items.DebugRW) ? 3 : (PlayState.CheckForItem(PlayState.Items.Boomerang) ||
-                    PlayState.CheckForItem(PlayState.Items.SSBoom) ? 2 : (PlayState.CheckForItem(PlayState.Items.Peashooter) ? 1 : 0)));
+            //if (PlayState.lastLoadedWeapon != 0)
+            //    PlayState.globalFunctions.ChangeActiveWeapon(PlayState.lastLoadedWeapon);
+            //else
+            //    PlayState.globalFunctions.ChangeActiveWeapon(PlayState.CheckForItem(PlayState.Items.RainbowWave) ||
+            //        PlayState.CheckForItem(PlayState.Items.DebugRW) ? 3 : (PlayState.CheckForItem(PlayState.Items.Boomerang) ||
+            //        PlayState.CheckForItem(PlayState.Items.SSBoom) ? 2 : (PlayState.CheckForItem(PlayState.Items.Peashooter) ? 1 : 0)));
+            //byte bitwiseID = 1;
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    if ((PlayState.lastLoadedWeapon & bitwiseID) == bitwiseID)
+            //        PlayState.globalFunctions.ToggleWeapon(i);
+            //}
+
             PlayState.isRandomGame = PlayState.currentRando.randoLevel > 0;
         }
         if (PlayState.isInBossRush)

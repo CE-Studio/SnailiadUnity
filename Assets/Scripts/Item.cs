@@ -340,14 +340,16 @@ public class Item:MonoBehaviour, IRoomObject {
                 case PlayState.Items.Peashooter:
                     if (PlayState.playerScript.selectedWeapon == 0)
                         PlayState.TogglableHUDElements[17].GetComponent<ControlPopup>().RunPopup(true, Control.lastInputIsCon);
-                    PlayState.globalFunctions.ChangeActiveWeapon(1, true);
+                    //PlayState.globalFunctions.ChangeActiveWeapon(1, true);
+                    PlayState.globalFunctions.ActivateWeapon(1);
                     break;
 
                 case PlayState.Items.Boomerang:
                 case PlayState.Items.SSBoom:
                     if (PlayState.playerScript.selectedWeapon == 0)
                         PlayState.TogglableHUDElements[17].GetComponent<ControlPopup>().RunPopup(true, Control.lastInputIsCon);
-                    PlayState.globalFunctions.ChangeActiveWeapon(2, true);
+                    //PlayState.globalFunctions.ChangeActiveWeapon(2, true);
+                    PlayState.globalFunctions.ActivateWeapon(2);
                     if (itemID == (int)PlayState.Items.SSBoom)
                         PlayState.QueueAchievementPopup(AchievementPanel.Achievements.SuperSecretBoom);
                     break;
@@ -356,7 +358,8 @@ public class Item:MonoBehaviour, IRoomObject {
                 case PlayState.Items.DebugRW:
                     if (PlayState.playerScript.selectedWeapon == 0)
                         PlayState.TogglableHUDElements[17].GetComponent<ControlPopup>().RunPopup(true, Control.lastInputIsCon);
-                    PlayState.globalFunctions.ChangeActiveWeapon(3, true);
+                    //PlayState.globalFunctions.ChangeActiveWeapon(3, true);
+                    PlayState.globalFunctions.ActivateWeapon(3);
                     break;
                 
                 case PlayState.Items.IceShell:

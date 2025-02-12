@@ -203,7 +203,7 @@ public class Player : MonoBehaviour, ICutsceneObject {
             else
                 //foreach (int weapon in new int[] { 0, 1, 2, 11, 12 })
                 foreach (PlayState.Items weapon in new PlayState.Items[]
-                    { PlayState.Items.Peashooter, PlayState.Items.Boomerang, PlayState.Items.SSBoom, PlayState.Items.RainbowWave, PlayState.Items.DebugRW } )
+                    { PlayState.Items.Peashooter, PlayState.Items.Boomerang, PlayState.Items.SSBoom, PlayState.Items.RainbowWave, PlayState.Items.DebugRW })
                     if (PlayState.CheckForItem(weapon))
                         armed = true;
 
@@ -235,32 +235,45 @@ public class Player : MonoBehaviour, ICutsceneObject {
                 PlayState.hasJumped = true;
 
             // Weapon swapping
+            //bool[] weaponStates = new bool[]
+            //{
+            //    PlayState.CheckForItem(PlayState.Items.Peashooter),
+            //    PlayState.CheckForItem(PlayState.Items.Boomerang) || PlayState.CheckForItem(PlayState.Items.SSBoom),
+            //    PlayState.CheckForItem(PlayState.Items.RainbowWave) || PlayState.CheckForItem(PlayState.Items.DebugRW)
+            //};
+            //if (Control.Weapon1() && weaponStates[0])
+            //    PlayState.globalFunctions.ChangeActiveWeapon((selectedWeapon == 1 && PlayState.isRandomGame && PlayState.currentRando.broomStart) ? 0 : 1);
+            //if (Control.Weapon2() && weaponStates[1])
+            //    PlayState.globalFunctions.ChangeActiveWeapon((selectedWeapon == 2 && PlayState.isRandomGame && PlayState.currentRando.broomStart) ? 0 : 2);
+            //if (Control.Weapon3() && weaponStates[2])
+            //    PlayState.globalFunctions.ChangeActiveWeapon((selectedWeapon == 3 && PlayState.isRandomGame && PlayState.currentRando.broomStart) ? 0 : 3);
+            //if (Control.NextWeapon() && selectedWeapon > 0)
+            //{
+            //    int thisIndex = selectedWeapon % weaponStates.Length;
+            //    while (!weaponStates[thisIndex] && thisIndex != selectedWeapon - 1)
+            //        thisIndex = (thisIndex + 1) % weaponStates.Length;
+            //    PlayState.globalFunctions.ChangeActiveWeapon(thisIndex + 1);
+            //}
+            //if (Control.PreviousWeapon() && selectedWeapon > 0)
+            //{
+            //    int thisIndex = selectedWeapon % weaponStates.Length;
+            //    while (!weaponStates[thisIndex] && thisIndex != selectedWeapon - 1)
+            //        thisIndex = (thisIndex - 1 + weaponStates.Length) % weaponStates.Length;
+            //    PlayState.globalFunctions.ChangeActiveWeapon(thisIndex + 1);
+            //}
             bool[] weaponStates = new bool[]
             {
+                PlayState.isRandomGame && PlayState.currentRando.broomStart,
                 PlayState.CheckForItem(PlayState.Items.Peashooter),
                 PlayState.CheckForItem(PlayState.Items.Boomerang) || PlayState.CheckForItem(PlayState.Items.SSBoom),
                 PlayState.CheckForItem(PlayState.Items.RainbowWave) || PlayState.CheckForItem(PlayState.Items.DebugRW)
             };
-            if (Control.Weapon1() && weaponStates[0])
-                PlayState.globalFunctions.ChangeActiveWeapon((selectedWeapon == 1 && PlayState.isRandomGame && PlayState.currentRando.broomStart) ? 0 : 1);
-            if (Control.Weapon2() && weaponStates[1])
-                PlayState.globalFunctions.ChangeActiveWeapon((selectedWeapon == 2 && PlayState.isRandomGame && PlayState.currentRando.broomStart) ? 0 : 2);
-            if (Control.Weapon3() && weaponStates[2])
-                PlayState.globalFunctions.ChangeActiveWeapon((selectedWeapon == 3 && PlayState.isRandomGame && PlayState.currentRando.broomStart) ? 0 : 3);
-            if (Control.NextWeapon() && selectedWeapon > 0)
-            {
-                int thisIndex = selectedWeapon % weaponStates.Length;
-                while (!weaponStates[thisIndex] && thisIndex != selectedWeapon - 1)
-                    thisIndex = (thisIndex + 1) % weaponStates.Length;
-                PlayState.globalFunctions.ChangeActiveWeapon(thisIndex + 1);
-            }
-            if (Control.PreviousWeapon() && selectedWeapon > 0)
-            {
-                int thisIndex = selectedWeapon % weaponStates.Length;
-                while (!weaponStates[thisIndex] && thisIndex != selectedWeapon - 1)
-                    thisIndex = (thisIndex - 1 + weaponStates.Length) % weaponStates.Length;
-                PlayState.globalFunctions.ChangeActiveWeapon(thisIndex + 1);
-            }
+            if (Control.Weapon1() && weaponStates[1])
+                PlayState.globalFunctions.ToggleWeapon(1);
+            if (Control.Weapon2() && weaponStates[2])
+                PlayState.globalFunctions.ToggleWeapon(2);
+            if (Control.Weapon3() && weaponStates[3])
+                PlayState.globalFunctions.ToggleWeapon(3);
 
             // Sleep code! Don't do anything for thirty seconds and Snaily takes a nap!
             if (PlayState.gameState == PlayState.GameState.game)
@@ -2350,7 +2363,7 @@ public class Player : MonoBehaviour, ICutsceneObject {
             Bullet thisBullet = PlayState.globalFunctions.playerBulletPool.transform.GetChild(bulletID).GetComponent<Bullet>();
             if (!thisBullet.isActive)
             {
-                thisBullet.Shoot(type, dir, applyRapidFireMultiplier);
+                thisBullet.Shoot(type, dir, applyRapidFireMultiplier, PlayState.CheckForItem(PlayState.Items.Devastator));
                 int fireRateIndex = Mathf.FloorToInt(type * 0.5f) * 2;
                 if (PlayState.CheckForItem(PlayState.Items.RapidFire) || (PlayState.CheckForItem(PlayState.Items.Devastator) && PlayState.stackWeaponMods))
                     fireRateIndex++;
@@ -2427,7 +2440,8 @@ public class Player : MonoBehaviour, ICutsceneObject {
             if (!PlayState.globalFunctions.playerBulletPool.transform.GetChild(bulletID).GetComponent<Bullet>().isActive)
             {
                 Bullet thisBullet = PlayState.globalFunctions.playerBulletPool.transform.GetChild(bulletID).GetComponent<Bullet>();
-                thisBullet.Shoot(PlayState.CheckForItem(PlayState.Items.Devastator) ? 11 : 10, i == 0 ? dir1 : dir2, false, pos.x, pos.y);
+                thisBullet.Shoot(PlayState.CheckForItem(PlayState.Items.Devastator) ? 11 : 10, i == 0 ? dir1 : dir2,
+                    false, PlayState.CheckForItem(PlayState.Items.Devastator), pos.x, pos.y);
             }
             bulletID = (bulletID + 1) % PlayState.globalFunctions.playerBulletPool.transform.childCount;
         }

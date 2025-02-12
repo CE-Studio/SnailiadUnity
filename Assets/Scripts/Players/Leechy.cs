@@ -267,7 +267,7 @@ public class Leechy : Player
             Bullet thisBullet = PlayState.globalFunctions.playerBulletPool.transform.GetChild(bulletID).GetComponent<Bullet>();
             if (!thisBullet.isActive)
             {
-                thisBullet.Shoot(type, dir, applyRapidFireMultiplier);
+                thisBullet.Shoot(type, dir, applyRapidFireMultiplier, PlayState.CheckForItem(PlayState.Items.Devastator));
                 if (!isShock)
                 {
                     bool applyRapid = PlayState.CheckForItem(PlayState.Items.RapidFire) ||
@@ -318,7 +318,7 @@ public class Leechy : Player
                             6 => 1,
                             _ => 0
                         };
-                        otherBullet.Shoot(type, backDir, applyRapidFireMultiplier);
+                        otherBullet.Shoot(type, backDir, applyRapidFireMultiplier, PlayState.CheckForItem(PlayState.Items.Devastator));
                         bulletID = (bulletID + 1) % PlayState.globalFunctions.playerBulletPool.transform.childCount;
                     }
                 }
