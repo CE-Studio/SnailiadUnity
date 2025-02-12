@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://dgd76ibvdfk3c"]
+
+[ext_resource type="Script" path="res://Scripts/Players/Snaily.gd" id="1_k5eab"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_31aru"]
+
+[node name="Snaily" type="Node2D"]
+script = ExtResource("1_k5eab")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
+shape = SubResource("RectangleShape2D_31aru")
