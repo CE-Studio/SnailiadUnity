@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://0iy0ekdh4dsy"
-path="res://.godot/imported/SnailySnail.png-dcbfc762ab1b93c4da5bd951643bf302.ctex"
+uid="uid://cesncq5yyy10e"
+path="res://.godot/imported/CutsceneControllable.svg-1c11d33f23a747e716e900f42166c49d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Resources/Images/SnailySnail.png"
-dest_files=["res://.godot/imported/SnailySnail.png-dcbfc762ab1b93c4da5bd951643bf302.ctex"]
+source_file="res://Editor/ico/CutsceneControllable.svg"
+dest_files=["res://.godot/imported/CutsceneControllable.svg-1c11d33f23a747e716e900f42166c49d.ctex"]
 
 [params]
 
@@ -32,3 +32,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

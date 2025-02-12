@@ -1,5 +1,5 @@
 class_name Player
-extends Node
+extends CutsceneControllable
 
 
 #region Global control

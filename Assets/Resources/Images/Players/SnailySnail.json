@@ -1,0 +1,18 @@
+{
+	"tiles": [12, 8],
+	"animations": {
+		"an_action": {
+			"fps": 3,
+			"loop": true,
+			"loop_point": 0,
+			"autoplay_next": "an_action",
+			"randomize_start": false,
+			"frames": [
+				[8, 0, false, false],
+				[9, 0, false, false],
+				[10, 0, false, false],
+				[11, 0, false, false]
+			]
+		}
+	}
+}
