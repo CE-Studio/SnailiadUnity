@@ -21,10 +21,11 @@ PlayState="*res://Scripts/PlayState.gd"
 
 [display]
 
-window/size/viewport_width=400
-window/size/viewport_height=240
+window/size/viewport_width=800
+window/size/viewport_height=480
 window/size/resizable=false
 window/stretch/mode="viewport"
+window/stretch/scale=2.0
 
 [input]
 

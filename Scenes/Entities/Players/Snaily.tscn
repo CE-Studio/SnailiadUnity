@@ -1,18 +1,19 @@
 [gd_scene load_steps=6 format=3 uid="uid://dgd76ibvdfk3c"]
 
 [ext_resource type="Script" path="res://Scripts/Players/Snaily.gd" id="1_k5eab"]
-[ext_resource type="Texture2D" uid="uid://0iy0ekdh4dsy" path="res://Assets/Resources/Images/Players/SnailySnail.png" id="2_8dcv5"]
 [ext_resource type="Script" path="res://Scripts/Classes/jsonSprite2D.gd" id="2_d17bl"]
+[ext_resource type="Texture2D" uid="uid://brv00uu770se5" path="res://Assets/Images/Players/Snaily.png" id="3_d2ww3"]
 [ext_resource type="Script" path="res://Editor/scripts/markersprite.gd" id="4_h84e5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_31aru"]
+size = Vector2(22, 16)
 
 [node name="Snaily" type="Node2D"]
 script = ExtResource("1_k5eab")
 
 [node name="JsonSprite2D" type="Sprite2D" parent="."]
 script = ExtResource("2_d17bl")
-texture_path = "res://Assets/Resources/Images/Players/SnailySnail.json"
+texture_path = "res://Assets/Images/Players/Snaily.json"
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
 
@@ -20,7 +21,7 @@ texture_path = "res://Assets/Resources/Images/Players/SnailySnail.json"
 shape = SubResource("RectangleShape2D_31aru")
 
 [node name="MarkerSprite" type="Sprite2D" parent="."]
-texture = ExtResource("2_8dcv5")
+texture = ExtResource("3_d2ww3")
 hframes = 12
-vframes = 8
+vframes = 4
 script = ExtResource("4_h84e5")
