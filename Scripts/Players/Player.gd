@@ -139,8 +139,8 @@ var box:CollisionShape2D
 
 
 func _ready():
-	pass
+	super()
 
 
 func _process(delta):
-	pass
+	super(delta)
