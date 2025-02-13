@@ -48,6 +48,7 @@ func _check_action():
 				if data["animations"][action]["randomize_start"]:
 					_index = randi_range(0, data["animations"][action]["frames"].size() - 1)
 		_recheck = false
+		return
 	_recheck = true
 
 
