@@ -164,7 +164,7 @@ func _process(delta: float) -> void:
 		if _timer >= _frametime:
 			_timer -= _frametime
 			var frame = _frames[_index]
-			if min(frame[0], frame[1]) < 1:
+			if min(frame[0], frame[1]) < 0:
 				hide()
 			else:
 				show()
