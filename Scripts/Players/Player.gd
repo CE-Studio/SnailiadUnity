@@ -6,12 +6,14 @@ extends CutsceneControllable
 const MAX_DIST_CASTS:int = 4
 const THIN_TUNNEL_ENTRANCE_STEPS:int = 16
 const DIST_CAST_EDGE_BUFFER:int = 0
-const STUCK_DETECT_MARGIN:float = PlayState.FRAC_64
+const STUCK_DETECT_MARGIN:float = Statics.FRAC_64
 
-var gravity_dir:PlayState.DirsSurface
-var last_gravity:PlayState.DirsSurface
-var home_gravity:PlayState.DirsSurface
-var current_surface:PlayState.DirsSurface
+var last_position:Vector2
+var last_box_size:Vector2
+var gravity_dir:Statics.DirsSurface
+var last_gravity:Statics.DirsSurface
+var home_gravity:Statics.DirsSurface
+var current_surface:Statics.DirsSurface
 var facing_left:bool
 var facing_down:bool
 var selected_weapon:int
@@ -57,7 +59,7 @@ var force_face_y:int
 # Example: setting hopWhileMoving to { { 4, 7 }, 8 } will make Snaily hop along the
 # ground if they find either (High Jump AND Ice Snail) OR Gravity Snail
 
-var default_gravity:PlayState.DirsSurface
+var default_gravity:Statics.DirsSurface
 # Determines the default direction gravity pulls the player
 var can_jump
 # [I] Determines if the player can jump
@@ -133,14 +135,52 @@ var health_gain_from_parry:int
 #endregion
 
 
-var sprite:Sprite2D
+var sprite:JsonSprite2D
 var body:CharacterBody2D
 var box:CollisionShape2D
 
 
+# _ready() is called every time this script is instanced
+# It's used here to initialize certain variables and node references
 func _ready():
 	super()
+	sprite = $"JsonSprite2D"
+	body = $"CharacterBody2D"
+	box = $"CharacterBody2D/CollisionShape2D"
+	Statics.player = self
 
 
+# _process() is called every frame and is used to update various timers and equipped weaponry
 func _process(delta):
 	super(delta)
+	
+	# Noclip!!
+	if Statics.noclip_mode:
+		box.disabled = true
+		var move_speed:float = 160.0
+		if Input.get_action_raw_strength("Jump"):
+			move_speed = 400.0
+		var move_dir = Vector2(Input.get_axis("Left", "Right"), Input.get_axis("Up", "Down"))
+		translate(move_dir * delta * move_speed)
+	else:
+		box.disabled = in_death_cutscene
+	
+	# Marking the "has jumped" flag for Snail NPC 01's dialogue
+	#if Input.is_action_just_pressed("Jump"):
+		#Statics.
+
+
+#region Movement
+# This function is called 60 times per second independent of framerate.
+# It's used here to control player movement
+func _physics_process(delta):
+	if Statics.noclip_mode:
+		return
+	# To start things off, we mark our current position as the last position we took. Same with our hitbox size.
+	# Among other things, this is used to test for ground when we're airborne.
+	last_position = position + box.position
+	last_box_size = box.shape.size
+	last_gravity = gravity_dir
+	grounded_last_frame = grounded
+	
+#endregion

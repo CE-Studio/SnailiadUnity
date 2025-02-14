@@ -6,7 +6,7 @@
 [ext_resource type="Script" path="res://Editor/scripts/markersprite.gd" id="4_h84e5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_31aru"]
-size = Vector2(22, 16)
+size = Vector2(24, 13)
 
 [node name="Snaily" type="Node2D"]
 script = ExtResource("1_k5eab")
@@ -18,6 +18,7 @@ texture_path = "res://Assets/Images/Players/Snaily.json"
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
+position = Vector2(0, 1.5)
 shape = SubResource("RectangleShape2D_31aru")
 
 [node name="MarkerSprite" type="Sprite2D" parent="."]

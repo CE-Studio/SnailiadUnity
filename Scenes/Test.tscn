@@ -5,8 +5,10 @@
 
 [node name="Node2D" type="Node2D"]
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="CameraLayer" type="Node2D" parent="."]
 position = Vector2(200, 120)
+
+[node name="Camera2D" type="Camera2D" parent="CameraLayer"]
 
 [node name="TileMaps" type="Node2D" parent="."]
 
