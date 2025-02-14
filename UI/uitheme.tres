@@ -1,0 +1,15 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://ftlqv2v5mipy"]
+
+[ext_resource type="Texture2D" uid="uid://bpo6uchb1gs50" path="res://Assets/Images/UI/9SlicedBox.png" id="1_g42j3"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nnoeq"]
+texture = ExtResource("1_g42j3")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+
+[resource]
+Button/font_sizes/font_size = 8
+Label/font_sizes/font_size = 8
+Panel/styles/panel = SubResource("StyleBoxTexture_nnoeq")

@@ -1,6 +1,6 @@
 extends Node
 
 
-func _process(delta):
-	if Input.is_action_just_pressed("Debug") and not Statics.is_menu_open:
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("Debug") and not Statics.is_menu_open:
 		Statics.noclip_mode = not Statics.noclip_mode

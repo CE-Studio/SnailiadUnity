@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d2apxf63op7bf"
-path="res://.godot/imported/errorpanel.png-28094c65b3af80b912316230d08401aa.ctex"
+path="res://.godot/imported/buttonpanel.png-01216024f362e694dad8b586774811f8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Resources/error/errorpanel.png"
-dest_files=["res://.godot/imported/errorpanel.png-28094c65b3af80b912316230d08401aa.ctex"]
+source_file="res://UI/buttonpanel.png"
+dest_files=["res://.godot/imported/buttonpanel.png-01216024f362e694dad8b586774811f8.ctex"]
 
 [params]
 
