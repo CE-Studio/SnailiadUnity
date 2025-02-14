@@ -56,7 +56,7 @@ var force_face_y:int
 # -1 = always, -2 = never, any item ID = item-bound, -3 = disabled by Gravity Lock
 # Item scheme variables can contain multiple values, denoting an assortment of items
 # that can fulfill a given check
-# Example: setting hopWhileMoving to { { 4, 7 }, 8 } will make Snaily hop along the
+# Example: setting hopWhileMoving to [ [ 4, 7 ], 8 ] will make Snaily hop along the
 # ground if they find either (High Jump AND Ice Snail) OR Gravity Snail
 
 var default_gravity:Statics.DirsSurface
@@ -181,6 +181,16 @@ func _physics_process(delta):
 	last_position = position + box.position
 	last_box_size = box.shape.size
 	last_gravity = gravity_dir
-	grounded_last_frame = grounded
-	
+	grounded_last_frame = body.is_on_floor() #grounded
+	# Next, we decrease the fire cooldown, and increase the coyote time and jump buffer as necessary
+	fire_cooldown = clampf(fire_cooldown, 0.0, INF)
+	if Input.get_action_raw_strength("Jump"):
+		jump_buffer_counter += delta
+	else:
+		jump_buffer_counter = 0.0
+	if (not body.is_on_floor()):
+		coyote_time_counter += delta
+	else:
+		coyote_time_counter = 0.0
+	# We increment the Gravity Shock timer in case that happens to be active
 #endregion
