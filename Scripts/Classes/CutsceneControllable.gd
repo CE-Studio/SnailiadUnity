@@ -14,7 +14,7 @@ func _ready():
 	if OS.get_cmdline_args().has("debug"):
 		impulse(Vector2.ZERO)
 		glide_to(position, 0)
-		get_dialouge_icon()
+		get_dialogue_icon()
 		fake_input(InputEventAction.new(), 0)
 		look_at_position(global_position)
 		look_at_local(Vector2.ZERO)
@@ -47,8 +47,8 @@ func glide_to(position:Vector2, duration:float) -> bool:
 
 
 ## Returns the image used to represent this object in dailouge boxes.
-func get_dialouge_icon() -> Texture:
-	assert(false, str(get_path()) + ": Required func 'get_dialouge_icon() -> Texture' not defined!")
+func get_dialogue_icon() -> Texture:
+	assert(false, str(get_path()) + ": Required func 'get_dialogue_icon() -> Texture' not defined!")
 	return null
 
 

@@ -47,6 +47,9 @@ var coyote_time_counter:float
 var last_point_before_hop:float
 var force_face_x:int
 var force_face_y:int
+var grav_shock_state:int
+var grav_shock_timer:float
+var time_since_shell:float
 #endregion
 
 
@@ -193,4 +196,102 @@ func _physics_process(delta):
 	else:
 		coyote_time_counter = 0.0
 	# We increment the Gravity Shock timer in case that happens to be active
+	if grav_shock_state < 0:
+		grav_shock_state += 1
+	if grav_shock_state > 0:
+		grav_shock_timer += delta
+	else:
+		grav_shock_timer = 0
+	# Home gravity thingy
+	
+	# Next, we target a different block of movement code dependent on our current gravity
+	# Under typical circumstances, each gravity case would be the same with just a few directionally-dependent values adjusted,
+	# but they're referenced separately like this in case a certain character needs a unique case for a particular direction
+	if not in_death_cutscene:
+		#read_i_speed = Statics.get_shell_level
+		#read_i_jump = read_i_speed + (4 if Statics.check_for_item(Statics.Items.HighJump) else 0)
+		read_i_speed = 0
+		read_i_jump = 0
+		match gravity_dir:
+			Statics.DirsSurface.FLOOR:
+				_case_down()
+			Statics.DirsSurface.LWALL:
+				_case_left()
+			Statics.DirsSurface.RWALL:
+				_case_right()
+			Statics.DirsSurface.CEILING:
+				_case_up()
+			_:
+				_case_down()
+		if velocity.x == INF or velocity.x == -INF:
+			velocity.x = 0
+		if velocity.y == INF or velocity.y == -INF:
+			velocity.y = 0
+		
+
+
+func _case_down():
+	_case_default(Statics.DirsSurface.FLOOR)
+
+
+func _case_left():
+	_case_default(Statics.DirsSurface.LWALL)
+
+
+func _case_right():
+	_case_default(Statics.DirsSurface.RWALL)
+
+
+func _case_up():
+	_case_default(Statics.DirsSurface.CEILING)
+
+
+func _case_default(surface:Statics.DirsSurface):
+	pass
+#endregion
+
+
+#region Cutscene functions
+func impulse(direction:Vector2) -> bool:
+	return false
+
+
+func glide_to(position:Vector2, duration:float) -> bool:
+	return false
+
+
+func get_dialogue_icon() -> Texture:
+	return null
+
+
+func fake_input(event:InputEventAction, hold_for:float) -> bool:
+	return false
+
+
+func look_at_position(pos:Vector2) -> bool:
+	return false
+
+
+func look_at_local(pos:Vector2) -> bool:
+	return false
+
+
+func look_at_node(node:Node2D) -> bool:
+	return false
+
+
+func lock_inputs(locked:bool) -> bool:
+	return false
+
+
+func has_item(ID:Statics.Items) -> bool:
+	return false
+
+
+func can_perform_action(action:String) -> bool:
+	return false
+
+
+func perform_action(action:String, force:bool) -> bool:
+	return false
 #endregion
