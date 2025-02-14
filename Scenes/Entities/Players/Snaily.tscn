@@ -16,6 +16,7 @@ script = ExtResource("2_d17bl")
 texture_path = "res://Assets/Images/Players/Snaily.json"
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+top_level = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
 position = Vector2(0, 1.5)
