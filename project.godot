@@ -13,11 +13,13 @@ config_version=5
 config/name="Snailiad Plus"
 config/version="0.4.0"
 config/features=PackedStringArray("4.3", "Double Precision", "Forward Plus")
+run/max_fps=60
 config/icon="res://Assets/Images/Icon.png"
 
 [autoload]
 
 StaticProcess="*res://Scripts/StaticProcess.gd"
+cutcontroll="res://Scenes/internals/CutsceneController.tscn"
 
 [display]
 
@@ -30,6 +32,11 @@ window/stretch/scale=2.0
 [editor]
 
 run/main_run_args="debug"
+
+[gui]
+
+theme/custom="res://UI/uitheme.tres"
+theme/custom_font="res://Assets/Fonts/SnailplanesExtended.ttf"
 
 [input]
 
