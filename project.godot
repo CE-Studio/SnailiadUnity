@@ -27,6 +27,10 @@ window/size/resizable=false
 window/stretch/mode="viewport"
 window/stretch/scale=2.0
 
+[editor]
+
+run/main_run_args="debug"
+
 [input]
 
 Left={
