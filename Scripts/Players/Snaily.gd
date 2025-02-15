@@ -18,10 +18,10 @@ func _ready():
 	can_round_outer_corners = [ -1 ]
 	can_round_opposite_outer_corners = [ Statics.Items.FLYSHELL ]
 	stick_to_walls_when_hurt = [ Statics.Items.FLYSHELL ]
-	run_speed = [ 8.6667, 8.6667, 8.6667, 11 ]
-	jump_power = [ 26.5, 26.5, 26.5, 26.5, 31.125, 31.125, 31.125, 31.125 ]
-	gravity = [ 1.5, 1.5, 1.5, 1.5 ]
-	terminal_velocity = [ 0.5208, 0.5208, 0.5208, 0.5208 ]
+	run_speed = [ 138.6667, 138.6667, 138.6667, 176 ]
+	jump_power = [ 424.0, 424.0, 424.0, 424.0, 498, 498, 498, 498 ]
+	gravity = [ 24, 24, 24, 24 ]
+	terminal_velocity = [ 8.3328, 8.3328, 8.3328, 8.3328 ]
 	jump_floatiness = [ 4, 4, 4, 4, 4, 4, 4, 4 ]
 	#weapon_cooldowns
 	apply_rapid_fire_multiplier = true
@@ -40,6 +40,7 @@ func _ready():
 	grav_shock_steering = 2.5
 	damage_multiplier = 1
 	health_gain_from_parry = 4
+	
 	sprite.action = "0.ground.right.idle"
 
 

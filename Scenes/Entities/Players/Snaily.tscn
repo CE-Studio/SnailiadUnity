@@ -17,6 +17,8 @@ texture_path = "res://Assets/Images/Players/Snaily.json"
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
 top_level = true
+collision_layer = 4
+collision_mask = 25
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
 position = Vector2(0, 1.5)
@@ -27,3 +29,25 @@ texture = ExtResource("3_d2ww3")
 hframes = 12
 vframes = 4
 script = ExtResource("4_h84e5")
+
+[node name="CastGroup" type="Node2D" parent="."]
+
+[node name="Cast0" type="RayCast2D" parent="CastGroup"]
+position = Vector2(-12, 8)
+target_position = Vector2(0, 12)
+hit_from_inside = true
+
+[node name="Cast1" type="RayCast2D" parent="CastGroup"]
+position = Vector2(-4, 8)
+target_position = Vector2(0, 12)
+hit_from_inside = true
+
+[node name="Cast2" type="RayCast2D" parent="CastGroup"]
+position = Vector2(4, 8)
+target_position = Vector2(0, 12)
+hit_from_inside = true
+
+[node name="Cast3" type="RayCast2D" parent="CastGroup"]
+position = Vector2(12, 8)
+target_position = Vector2(0, 12)
+hit_from_inside = true
