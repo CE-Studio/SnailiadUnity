@@ -15,6 +15,32 @@ texture = ExtResource("2_r73cr")
 axis_stretch_horizontal = 1
 axis_stretch_vertical = 1
 
+[sub_resource type="Animation" id="Animation_wj2ip"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/Panel:material:shader_parameter/fade")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat64Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat64Array(0)
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Control/MarginContainer:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat64Array(0),
+"transitions": PackedFloat64Array(1),
+"update": 1,
+"values": [false]
+}
+
 [sub_resource type="Animation" id="Animation_6khaw"]
 resource_name = "appear"
 length = 2.0
@@ -57,32 +83,6 @@ tracks/2/keys = {
 "values": [false, true]
 }
 
-[sub_resource type="Animation" id="Animation_wj2ip"]
-length = 0.001
-tracks/0/type = "bezier"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Control/Panel:material:shader_parameter/fade")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"handle_modes": PackedInt32Array(0),
-"points": PackedFloat64Array(0, -0.25, 0, 0.25, 0),
-"times": PackedFloat64Array(0)
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Control/MarginContainer:visible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat64Array(0),
-"transitions": PackedFloat64Array(1),
-"update": 1,
-"values": [false]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_fv03o"]
 _data = {
 "RESET": SubResource("Animation_wj2ip"),
@@ -90,6 +90,7 @@ _data = {
 }
 
 [node name="CutsceneController" type="Node"]
+process_mode = 3
 script = ExtResource("1_ssxem")
 
 [node name="Control" type="Control" parent="."]
@@ -154,7 +155,6 @@ size_flags_horizontal = 3
 
 [node name="Label" type="Label" parent="Control/MarginContainer/Panel2/MarginContainer/VBoxContainer/HBoxContainer/CenterContainer2"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 8
 text = "Error!!"
 
 [node name="CenterContainer" type="CenterContainer" parent="Control/MarginContainer/Panel2/MarginContainer/VBoxContainer/HBoxContainer"]
@@ -171,13 +171,11 @@ layout_mode = 2
 [node name="Button" type="Button" parent="Control/MarginContainer/Panel2/MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 8
 text = "copy"
 
 [node name="Button2" type="Button" parent="Control/MarginContainer/Panel2/MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 8
 text = "continue"
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]

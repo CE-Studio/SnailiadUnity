@@ -36,7 +36,7 @@ run/main_run_args="debug"
 [gui]
 
 theme/custom="res://UI/uitheme.tres"
-theme/custom_font="res://Assets/Fonts/SnailplanesExtended.ttf"
+theme/custom_font="res://UI/Snailplanes Extended.ttf"
 
 [input]
 

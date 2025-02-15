@@ -10,6 +10,18 @@ texture_margin_right = 6.0
 texture_margin_bottom = 6.0
 
 [resource]
-Button/font_sizes/font_size = 8
-Label/font_sizes/font_size = 8
+Button/font_sizes/font_size = 10
+Label/font_sizes/font_size = 10
+LineEdit/font_sizes/font_size = 10
 Panel/styles/panel = SubResource("StyleBoxTexture_nnoeq")
+PopupMenu/font_sizes/font_separator_size = 10
+PopupMenu/font_sizes/font_size = 10
+PopupMenu/font_sizes/title_font_size = 10
+PopupPanel/font_sizes/title_font_size = 10
+ProgressBar/font_sizes/font_size = 10
+TabBar/font_sizes/font_size = 10
+TabContainer/font_sizes/font_size = 10
+TextEdit/font_sizes/font_size = 10
+TooltipLabel/font_sizes/font_size = 10
+Tree/font_sizes/font_size = 10
+Tree/font_sizes/title_button_font_size = 10
