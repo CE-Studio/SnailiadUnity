@@ -151,6 +151,7 @@ func _ready():
 	body = $"CharacterBody2D"
 	box = $"CharacterBody2D/CollisionShape2D"
 	Statics.player = self
+	body.position = position
 
 
 # _process() is called every frame and is used to update various timers and equipped weaponry
@@ -164,9 +165,13 @@ func _process(delta):
 		if Input.get_action_raw_strength("Jump"):
 			move_speed = 400.0
 		var move_dir = Vector2(Input.get_axis("Left", "Right"), Input.get_axis("Up", "Down"))
-		translate(move_dir * delta * move_speed)
+		#translate(move_dir * delta * move_speed)
+		body.velocity = move_dir * move_speed
+		body.move_and_slide()
+		position = body.position
 	else:
 		box.disabled = in_death_cutscene
+	var ray:RayCast2D
 	
 	# Marking the "has jumped" flag for Snail NPC 01's dialogue
 	#if Input.is_action_just_pressed("Jump"):
@@ -223,11 +228,10 @@ func _physics_process(delta):
 				_case_up()
 			_:
 				_case_down()
-		if velocity.x == INF or velocity.x == -INF:
-			velocity.x = 0
-		if velocity.y == INF or velocity.y == -INF:
-			velocity.y = 0
-		
+		if body.velocity.x == INF or body.velocity.x == -INF:
+			body.velocity.x = 0
+		if body.velocity.y == INF or body.velocity.y == -INF:
+			body.velocity.y = 0
 
 
 func _case_down():
@@ -247,7 +251,37 @@ func _case_up():
 
 
 func _case_default(surface:Statics.DirsSurface):
-	pass
+	var input_axis_x:float = Input.get_axis("Left", "Right")
+	var input_axis_y:float = Input.get_axis("Up", "Down")
+	var rel_axis:Vector2
+	var rel_vel:Vector2
+	match surface:
+		Statics.DirsSurface.FLOOR:
+			rel_axis = Vector2(input_axis_x, input_axis_y)
+			rel_vel = Vector2(body.velocity.x, body.velocity.y)
+		Statics.DirsSurface.LWALL:
+			rel_axis = Vector2(input_axis_y, -input_axis_x)
+			rel_vel = Vector2(body.velocity.y, -body.velocity.x)
+		Statics.DirsSurface.RWALL:
+			rel_axis = Vector2(-input_axis_y, input_axis_x)
+			rel_vel = Vector2(-body.velocity.y, body.velocity.x)
+		Statics.DirsSurface.CEILING:
+			rel_axis = Vector2(-input_axis_x, -input_axis_y)
+			rel_vel = Vector2(-body.velocity.x, -body.velocity.y)
+	
+	rel_vel.x = rel_axis.x * run_speed[read_i_speed]
+	
+	match surface:
+		Statics.DirsSurface.FLOOR:
+			body.velocity = rel_vel
+		Statics.DirsSurface.LWALL:
+			body.velocity = Vector2(rel_vel.y, -rel_vel.x)
+		Statics.DirsSurface.RWALL:
+			body.velocity = Vector2(-rel_vel.y, rel_vel.x)
+		Statics.DirsSurface.CEILING:
+			body.velocity = -rel_vel
+	body.move_and_slide()
+	position = body.position
 #endregion
 
 

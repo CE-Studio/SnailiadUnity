@@ -43,4 +43,4 @@ tile_set = ExtResource("1_ni5o3")
 collision_enabled = false
 
 [node name="Snaily" parent="." instance=ExtResource("2_fgagt")]
-position = Vector2(98, 136)
+position = Vector2(95, 152)

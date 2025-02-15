@@ -149,6 +149,10 @@ Debug={
 [layer_names]
 
 2d_physics/layer_1="WorldCollide"
+2d_physics/layer_2="EnemyCollide"
+2d_physics/layer_3="Player"
+2d_physics/layer_4="Hazard"
+2d_physics/layer_5="Interactable"
 
 [rendering]
 
