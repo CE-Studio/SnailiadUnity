@@ -57,8 +57,8 @@ static var show_entity_layer:bool = false
 
 # Block of vars from musicParent to healthOrbPointer
 
-static var palette := "res://Assets/Images/Palette.png"
-static var missing := "res://Assets/Images/Missing.png"
+static var palette := preload("res://Assets/Images/Palette.png")
+static var missing := preload("res://Assets/Images/Missing.png")
 
 static var current_area:int = 0
 static var current_subarea:int = 0
@@ -88,6 +88,11 @@ enum Items {
 	RADARSHELL,
 	NONE,
 }
+#endregion
+
+
+#region Save info
+static var profile:String
 #endregion
 
 

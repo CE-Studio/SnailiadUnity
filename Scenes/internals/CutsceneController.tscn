@@ -1,10 +1,11 @@
-[gd_scene load_steps=11 format=3 uid="uid://cn0i5sa8m78t3"]
+[gd_scene load_steps=12 format=3 uid="uid://cn0i5sa8m78t3"]
 
 [ext_resource type="Script" path="res://Scripts/Classes/CutsceneController.gd" id="1_ssxem"]
 [ext_resource type="Shader" uid="uid://c2jiouympoi7d" path="res://Scenes/internals/CutsceneControllerErrorShader.tres" id="2_6ydxn"]
 [ext_resource type="Texture2D" uid="uid://byaenqj6o648n" path="res://UI/errorbacking.png" id="2_r73cr"]
 [ext_resource type="AudioStream" uid="uid://hy655rr7l73k" path="res://Assets/Resources/error/SnailyError.ogg" id="4_8b4nq"]
 [ext_resource type="Texture2D" uid="uid://dckcsqki31n2a" path="res://Assets/Resources/error/SnailyError.png" id="4_gc0g0"]
+[ext_resource type="Texture2D" uid="uid://d1bbnms8harwj" path="res://UI/cutplayingicon.png" id="5_xegkh"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h4kkg"]
 shader = ExtResource("2_6ydxn")
@@ -177,6 +178,14 @@ text = "copy"
 layout_mode = 2
 size_flags_horizontal = 3
 text = "continue"
+
+[node name="TextureRect" type="TextureRect" parent="Control"]
+layout_mode = 1
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 14.0
+offset_bottom = 14.0
+texture = ExtResource("5_xegkh")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("4_8b4nq")
