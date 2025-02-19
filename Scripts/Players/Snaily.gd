@@ -19,9 +19,9 @@ func _ready():
 	can_round_opposite_outer_corners = [ Statics.Items.FLYSHELL ]
 	stick_to_walls_when_hurt = [ Statics.Items.FLYSHELL ]
 	run_speed = [ 138.6667, 138.6667, 138.6667, 176 ]
-	jump_power = [ 424.0, 424.0, 424.0, 424.0, 498, 498, 498, 498 ]
-	gravity = [ 24, 24, 24, 24 ]
-	terminal_velocity = [ 8.3328, 8.3328, 8.3328, 8.3328 ]
+	jump_power = [ -428, -428, -428, -428, -498, -498, -498, -498 ]
+	gravity = [ 20, 20, 20, 20, 20, 20, 20, 20 ]
+	terminal_velocity = [ 500, 500, 500, 500, 500, 500, 500, 500 ]
 	jump_floatiness = [ 4, 4, 4, 4, 4, 4, 4, 4 ]
 	#weapon_cooldowns
 	apply_rapid_fire_multiplier = true
@@ -32,10 +32,10 @@ func _ready():
 	hitbox_offset_shell = Vector2(-3, 1.5)
 	#unshell_adjust
 	shell_turnaround_adjust = 0.1667
-	coyote_time = 0.0625
+	coyote_time = 0.125
 	jump_buffer = 0.125
 	grav_shock_charge_time = 0.75
-	grav_shock_charge_mult - 0.5
+	grav_shock_charge_mult = 0.5
 	grav_shock_speed = 40.0
 	grav_shock_steering = 2.5
 	damage_multiplier = 1

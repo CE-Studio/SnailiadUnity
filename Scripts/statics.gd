@@ -112,3 +112,11 @@ static func is_number(value:Variant, consider_strings := false) -> bool:
 			if value.is_valid_hex_number(true):
 				return true
 	return false
+
+
+static func integrate(num:float, target:float, speed:float, elapsed:float, threshold:float = 0.1) -> float:
+	var scale = pow(0.1, speed)
+	num = num * pow(scale, elapsed) + target * (1.0 - pow(scale, elapsed))
+	if absf(num - target) < threshold:
+		num = target
+	return num

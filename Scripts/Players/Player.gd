@@ -30,11 +30,11 @@ var shelled:bool
 var ungrounded_via_hop:bool
 var last_distance:float
 var toggle_mode_active:bool
-var speed_mod:float
-var jump_mod:float
-var gravity_mod:float
-var holding_jump:bool
-var holding_shell:bool
+var speed_mod:float = 1.0
+var jump_mod:float = 1.0
+var gravity_mod:float = 1.0
+var holding_jump:bool = false
+var holding_shell:bool = false
 var axis_flag:bool
 var against_wall:bool
 var fire_cooldown:float
@@ -50,6 +50,8 @@ var force_face_y:int
 var grav_shock_state:int
 var grav_shock_timer:float
 var time_since_shell:float
+
+var box_shape:RectangleShape2D = RectangleShape2D.new()
 #endregion
 
 
@@ -152,6 +154,10 @@ func _ready():
 	box = $"CharacterBody2D/CollisionShape2D"
 	Statics.player = self
 	body.position = position
+	box_shape.set_deferred("Size", hitbox_size_normal)
+	box.set_deferred("Shape", box_shape)
+	box.set_deferred("Position", hitbox_offset_normal)
+	print(box_shape.size)
 
 
 # _process() is called every frame and is used to update various timers and equipped weaponry
@@ -192,7 +198,7 @@ func _physics_process(delta):
 	grounded_last_frame = body.is_on_floor() #grounded
 	# Next, we decrease the fire cooldown, and increase the coyote time and jump buffer as necessary
 	fire_cooldown = clampf(fire_cooldown, 0.0, INF)
-	if Input.get_action_raw_strength("Jump"):
+	if Input.is_action_pressed("Jump"):
 		jump_buffer_counter += delta
 	else:
 		jump_buffer_counter = 0.0
@@ -219,58 +225,88 @@ func _physics_process(delta):
 		read_i_jump = 0
 		match gravity_dir:
 			Statics.DirsSurface.FLOOR:
-				_case_down()
+				_case_down(delta)
 			Statics.DirsSurface.LWALL:
-				_case_left()
+				_case_left(delta)
 			Statics.DirsSurface.RWALL:
-				_case_right()
+				_case_right(delta)
 			Statics.DirsSurface.CEILING:
-				_case_up()
+				_case_up(delta)
 			_:
-				_case_down()
+				_case_down(delta)
 		if body.velocity.x == INF or body.velocity.x == -INF:
 			body.velocity.x = 0
 		if body.velocity.y == INF or body.velocity.y == -INF:
 			body.velocity.y = 0
 
 
-func _case_down():
-	_case_default(Statics.DirsSurface.FLOOR)
+func _case_down(delta:float):
+	_case_default(delta, Statics.DirsSurface.FLOOR)
 
 
-func _case_left():
-	_case_default(Statics.DirsSurface.LWALL)
+func _case_left(delta:float):
+	_case_default(delta, Statics.DirsSurface.LWALL)
 
 
-func _case_right():
-	_case_default(Statics.DirsSurface.RWALL)
+func _case_right(delta:float):
+	_case_default(delta, Statics.DirsSurface.RWALL)
 
 
-func _case_up():
-	_case_default(Statics.DirsSurface.CEILING)
+func _case_up(delta:float):
+	_case_default(delta, Statics.DirsSurface.CEILING)
 
 
-func _case_default(surface:Statics.DirsSurface):
+func _case_default(delta:float, surface:Statics.DirsSurface):
+	#region Set relative
 	var input_axis_x:float = Input.get_axis("Left", "Right")
 	var input_axis_y:float = Input.get_axis("Up", "Down")
 	var rel_axis:Vector2
 	var rel_vel:Vector2
+	var rel_down_pressed:bool
 	match surface:
 		Statics.DirsSurface.FLOOR:
 			rel_axis = Vector2(input_axis_x, input_axis_y)
 			rel_vel = Vector2(body.velocity.x, body.velocity.y)
+			rel_down_pressed = Input.is_action_just_pressed("Down")
 		Statics.DirsSurface.LWALL:
 			rel_axis = Vector2(input_axis_y, -input_axis_x)
 			rel_vel = Vector2(body.velocity.y, -body.velocity.x)
+			rel_down_pressed = Input.is_action_just_pressed("Left")
 		Statics.DirsSurface.RWALL:
 			rel_axis = Vector2(-input_axis_y, input_axis_x)
 			rel_vel = Vector2(-body.velocity.y, body.velocity.x)
+			rel_down_pressed = Input.is_action_just_pressed("Right")
 		Statics.DirsSurface.CEILING:
 			rel_axis = Vector2(-input_axis_x, -input_axis_y)
 			rel_vel = Vector2(-body.velocity.x, -body.velocity.y)
+			rel_down_pressed = Input.is_action_just_pressed("Up")
+	#endregion
 	
-	rel_vel.x = rel_axis.x * run_speed[read_i_speed]
+	rel_vel.x = rel_axis.x * run_speed[read_i_speed] * speed_mod
+	if body.is_on_floor():
+		grounded = true
+		if (Input.is_action_just_pressed("Jump") or
+		(Input.is_action_pressed("Jump") and (jump_buffer_counter < jump_buffer))):
+			rel_vel.y = jump_power[read_i_jump] * jump_mod
+			grounded = false
+	else:
+		rel_vel.y += gravity[read_i_jump] * gravity_mod
+		if rel_vel.y < 0.0 and not Input.is_action_pressed("Jump"):
+			rel_vel.y = Statics.integrate(rel_vel.y, 0.0, jump_floatiness[read_i_speed], delta)
+		rel_vel.y = clampf(rel_vel.y, -INF, terminal_velocity[read_i_jump])
+		if Input.is_action_just_pressed("Jump") and (coyote_time_counter < coyote_time):
+			rel_vel.y = jump_power[read_i_jump] * jump_mod
+			grounded = false
 	
+	if rel_down_pressed and rel_vel.x == 0 and _check_ability(shellable):
+		shelled = true
+		#box.shape.get_rect().size = hitbox_size_shell
+		#box.position = hitbox_offset_shell
+		box_shape.set_deferred("Size", hitbox_size_shell)
+		box.set_deferred("Shape", box_shape)
+		box.set_deferred("Position", hitbox_offset_shell)
+	
+	#region Restore relative
 	match surface:
 		Statics.DirsSurface.FLOOR:
 			body.velocity = rel_vel
@@ -280,9 +316,27 @@ func _case_default(surface:Statics.DirsSurface):
 			body.velocity = Vector2(-rel_vel.y, rel_vel.x)
 		Statics.DirsSurface.CEILING:
 			body.velocity = -rel_vel
+	#endregion
+	
 	body.move_and_slide()
 	position = body.position
+	if not grounded and (body.is_on_floor() or body.is_on_ceiling()):
+		if surface == Statics.DirsSurface.FLOOR or surface == Statics.DirsSurface.CEILING:
+			body.velocity.y = 0.0
+		else:
+			body.velocity.x = 0.0
+		if body.is_on_floor():
+			grounded = true
 #endregion
+
+
+func _check_ability(ability:Array) -> bool:
+	var found = false
+	for i in ability:
+		if Statics.is_number(i):
+			if i == -1:
+				found = true
+	return found
 
 
 #region Cutscene functions
