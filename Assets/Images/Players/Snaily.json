@@ -22,8 +22,8 @@
 			]
 		},
 		"0.ground.right.shell": {
-			"fps": 0,
-			"loop": true,
+			"fps": 1,
+			"loop": false,
 			"loop_point": 0,
 			"randomize_start": false,
 			"frames": [
@@ -31,8 +31,8 @@
 			]
 		},
 		"0.ground.left.shell": {
-			"fps": 0,
-			"loop": true,
+			"fps": 1,
+			"loop": false,
 			"loop_point": 0,
 			"randomize_start": false,
 			"frames": [
