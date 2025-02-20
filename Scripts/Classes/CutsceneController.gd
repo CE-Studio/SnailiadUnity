@@ -46,6 +46,33 @@ static func run_event(ID:StringName) -> Status:
 	return Status.BUSY
 
 
+static func _extract_strings(inp:String) -> Array:
+	var instring := false
+	var outp = [""]
+	var i := 0
+	while i < len(inp):
+		var letter = inp[i]
+		if instring:
+			if letter == "\\":
+				outp[-1] += (letter + inp[i + 1])
+				i += 1
+			elif letter == "\"":
+				instring = false
+				outp.append("")
+			else:
+				outp[-1] += letter
+		else:
+			if letter == "\"":
+				instring = true
+				outp.append("")
+			else:
+				outp[-1] += letter
+		i += 1
+	if outp[-1] == "":
+		outp.resize(outp.size() - 1)
+	return outp
+
+
 static func load_event(path:String, ID:StringName) -> bool:
 	if FileAccess.file_exists(path):
 		var f = FileAccess.open(path, FileAccess.READ)
@@ -86,6 +113,8 @@ static func load_event(path:String, ID:StringName) -> bool:
 			raw[i] = [indent, iter.strip_edges()]
 		for i in raw:
 			var line = i[1]
+			i[1] = _extract_strings(line)
+			print(i)
 	else:
 		_stat = Status.FILE_ERROR
 		return false
