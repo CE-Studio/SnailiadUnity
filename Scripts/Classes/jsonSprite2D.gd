@@ -36,7 +36,7 @@ var action:String:
 	set(value):
 		action = value
 		_index = 0
-		_timer = 0
+		_timer = -2
 		_check_action()
 
 
@@ -162,8 +162,11 @@ func _process(delta: float) -> void:
 		var _fps:float = _action["fps"]
 		var _frames:Array = _action["frames"]
 		var _frametime = 1 / _fps
-		if _timer >= _frametime:
-			_timer -= _frametime
+		if (_timer >= _frametime) or (_timer < -1):
+			if _timer < -1:
+				_timer = 0
+			else:
+				_timer -= _frametime
 			var frame = _frames[_index]
 			if min(frame[0], frame[1]) < 0:
 				hide()
