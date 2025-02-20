@@ -15,7 +15,6 @@ var last_gravity:Statics.DirsSurface
 var home_gravity:Statics.DirsSurface
 var current_surface:Statics.DirsSurface
 var facing_left:bool
-var facing_down:bool
 var selected_weapon:int
 var armed:bool
 var health:int
@@ -50,8 +49,6 @@ var force_face_y:int
 var grav_shock_state:int
 var grav_shock_timer:float
 var time_since_shell:float
-
-var box_shape:RectangleShape2D = RectangleShape2D.new()
 #endregion
 
 
@@ -142,7 +139,10 @@ var health_gain_from_parry:int
 
 var sprite:JsonSprite2D
 var body:CharacterBody2D
-var box:CollisionShape2D
+var box_normal:CollisionShape2D
+var box_shell:CollisionShape2D
+var sfx_jump:AudioStreamPlayer
+var sfx_shell:AudioStreamPlayer
 
 
 # _ready() is called every time this script is instanced
@@ -151,13 +151,13 @@ func _ready():
 	super()
 	sprite = $"JsonSprite2D"
 	body = $"CharacterBody2D"
-	box = $"CharacterBody2D/CollisionShape2D"
+	box_normal = $"CharacterBody2D/NormalRect"
+	box_shell = $"CharacterBody2D/ShellRect"
 	Statics.player = self
 	body.position = position
-	box_shape.set_deferred("Size", hitbox_size_normal)
-	box.set_deferred("Shape", box_shape)
-	box.set_deferred("Position", hitbox_offset_normal)
-	print(box_shape.size)
+	box_shell.set_deferred("disabled", true)
+	sfx_jump = $"AudioGroup/Jump"
+	sfx_shell = $"AudioGroup/Shell"
 
 
 # _process() is called every frame and is used to update various timers and equipped weaponry
@@ -166,17 +166,15 @@ func _process(delta):
 	
 	# Noclip!!
 	if Statics.noclip_mode:
-		box.disabled = true
+		box_normal.set_deferred("disabled", true)
+		box_shell.set_deferred("disabled", true)
 		var move_speed:float = 160.0
 		if Input.get_action_raw_strength("Jump"):
 			move_speed = 400.0
 		var move_dir = Vector2(Input.get_axis("Left", "Right"), Input.get_axis("Up", "Down"))
-		#translate(move_dir * delta * move_speed)
 		body.velocity = move_dir * move_speed
 		body.move_and_slide()
 		position = body.position
-	else:
-		box.disabled = in_death_cutscene
 	var ray:RayCast2D
 	
 	# Marking the "has jumped" flag for Snail NPC 01's dialogue
@@ -192,8 +190,8 @@ func _physics_process(delta):
 		return
 	# To start things off, we mark our current position as the last position we took. Same with our hitbox size.
 	# Among other things, this is used to test for ground when we're airborne.
-	last_position = position + box.position
-	last_box_size = box.shape.size
+	last_position = position + box_normal.position
+	last_box_size = box_shell.shape.size if shelled else box_normal.shape.size
 	last_gravity = gravity_dir
 	grounded_last_frame = body.is_on_floor() #grounded
 	# Next, we decrease the fire cooldown, and increase the coyote time and jump buffer as necessary
@@ -263,32 +261,63 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 	var rel_axis:Vector2
 	var rel_vel:Vector2
 	var rel_down_pressed:bool
+	var remapped_dirs:Array
 	match surface:
 		Statics.DirsSurface.FLOOR:
 			rel_axis = Vector2(input_axis_x, input_axis_y)
 			rel_vel = Vector2(body.velocity.x, body.velocity.y)
 			rel_down_pressed = Input.is_action_just_pressed("Down")
+			remapped_dirs = [
+				Statics.DirsSurface.FLOOR,
+				Statics.DirsSurface.LWALL,
+				Statics.DirsSurface.RWALL,
+				Statics.DirsSurface.CEILING
+			]
 		Statics.DirsSurface.LWALL:
 			rel_axis = Vector2(input_axis_y, -input_axis_x)
 			rel_vel = Vector2(body.velocity.y, -body.velocity.x)
 			rel_down_pressed = Input.is_action_just_pressed("Left")
+			remapped_dirs = [
+				Statics.DirsSurface.LWALL,
+				Statics.DirsSurface.CEILING,
+				Statics.DirsSurface.FLOOR,
+				Statics.DirsSurface.RWALL
+			]
 		Statics.DirsSurface.RWALL:
 			rel_axis = Vector2(-input_axis_y, input_axis_x)
 			rel_vel = Vector2(-body.velocity.y, body.velocity.x)
 			rel_down_pressed = Input.is_action_just_pressed("Right")
+			remapped_dirs = [
+				Statics.DirsSurface.RWALL,
+				Statics.DirsSurface.FLOOR,
+				Statics.DirsSurface.CEILING,
+				Statics.DirsSurface.LWALL
+			]
 		Statics.DirsSurface.CEILING:
 			rel_axis = Vector2(-input_axis_x, -input_axis_y)
 			rel_vel = Vector2(-body.velocity.x, -body.velocity.y)
 			rel_down_pressed = Input.is_action_just_pressed("Up")
+			remapped_dirs = [
+				Statics.DirsSurface.CEILING,
+				Statics.DirsSurface.RWALL,
+				Statics.DirsSurface.LWALL,
+				Statics.DirsSurface.FLOOR
+			]
 	#endregion
 	
 	rel_vel.x = rel_axis.x * run_speed[read_i_speed] * speed_mod
+	if ((rel_axis.x < 0.0 and not facing_left) or
+	(rel_axis.x > 0.0 and facing_left)):
+		_set_direction(remapped_dirs[Statics.DirsSurface.FLOOR], not facing_left)
 	if body.is_on_floor():
 		grounded = true
 		if (Input.is_action_just_pressed("Jump") or
 		(Input.is_action_pressed("Jump") and (jump_buffer_counter < jump_buffer))):
 			rel_vel.y = jump_power[read_i_jump] * jump_mod
 			grounded = false
+			sfx_jump.play()
+		if rel_vel.x != 0.0 and shelled:
+			_toggle_shell()
 	else:
 		rel_vel.y += gravity[read_i_jump] * gravity_mod
 		if rel_vel.y < 0.0 and not Input.is_action_pressed("Jump"):
@@ -297,14 +326,10 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 		if Input.is_action_just_pressed("Jump") and (coyote_time_counter < coyote_time):
 			rel_vel.y = jump_power[read_i_jump] * jump_mod
 			grounded = false
+			sfx_jump.play()
 	
 	if rel_down_pressed and rel_vel.x == 0 and _check_ability(shellable):
-		shelled = true
-		#box.shape.get_rect().size = hitbox_size_shell
-		#box.position = hitbox_offset_shell
-		box_shape.set_deferred("Size", hitbox_size_shell)
-		box.set_deferred("Shape", box_shape)
-		box.set_deferred("Position", hitbox_offset_shell)
+		_toggle_shell()
 	
 	#region Restore relative
 	match surface:
@@ -337,6 +362,35 @@ func _check_ability(ability:Array) -> bool:
 			if i == -1:
 				found = true
 	return found
+
+
+func _set_direction(surface:Statics.DirsSurface, flipped:bool, set_home:bool = false):
+	gravity_dir = surface
+	if set_home:
+		home_gravity = surface
+	facing_left = flipped
+	match surface:
+		Statics.DirsSurface.FLOOR:
+			body.set_deferred("rotation_degrees", 0.0)
+		Statics.DirsSurface.LWALL:
+			body.set_deferred("rotation_degrees", 90.0)
+		Statics.DirsSurface.CEILING:
+			body.set_deferred("rotation_degrees", 180.0)
+		Statics.DirsSurface.RWALL:
+			body.set_deferred("rotation_degrees", 270.0)
+	body.set_deferred("scale", Vector2(-1 if flipped else 1, 1))
+
+
+func _toggle_shell():
+	_set_shell(not shelled)
+
+
+func _set_shell(state:bool):
+	shelled = state
+	box_normal.set_deferred("disabled", state)
+	box_shell.set_deferred("disabled", not state)
+	if state:
+		sfx_shell.play()
 
 
 #region Cutscene functions

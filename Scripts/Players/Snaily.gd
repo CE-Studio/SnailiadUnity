@@ -47,4 +47,9 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	super(delta)
-	pass
+	
+	var action_name = "0.ground."
+	action_name += "left" if facing_left else "right"
+	action_name += ".shell" if shelled else ".idle"
+	if sprite.action != action_name:
+		sprite.action = action_name
