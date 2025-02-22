@@ -1,6 +1,28 @@
 extends Player
 
 
+enum AnimStates {
+	IDLE,
+	WALK,
+	TURNGROUND,
+	JUMP,
+	TURNJUMP,
+	FALL,
+	TURNFALL,
+	LAND,
+	GRAVFLIPLEFT,
+	GRAVFLIPRIGHT,
+	GRAVFLIPUP,
+	SHELL,
+	UNSHELL,
+	SHOOT,
+	SHOCKCHARGE,
+	SHOCKRELEASE,
+	SHOCKLAND,
+}
+var current_state:AnimStates = AnimStates.IDLE
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	super()
@@ -50,6 +72,10 @@ func _process(delta):
 	
 	var action_name = "0.ground."
 	action_name += "left" if facing_left else "right"
-	action_name += ".shell" if shelled else ".idle"
+	if anim_turnaround:
+		action_name += ".turnground"
+	else:
+		action_name += ".shell" if shelled else ".idle"
 	if sprite.action != action_name:
 		sprite.action = action_name
+	anim_turnaround = false

@@ -137,6 +137,12 @@ var health_gain_from_parry:int
 #endregion
 
 
+#region Animation control
+var anim_turnaround:bool = false
+var anim_shell_toggle:bool = false
+#endregion
+
+
 var sprite:JsonSprite2D
 var body:CharacterBody2D
 var box_normal:CollisionShape2D
@@ -309,6 +315,7 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 	if ((rel_axis.x < 0.0 and not facing_left) or
 	(rel_axis.x > 0.0 and facing_left)):
 		_set_direction(remapped_dirs[Statics.DirsSurface.FLOOR], not facing_left)
+		anim_turnaround = true
 	if body.is_on_floor():
 		grounded = true
 		if (Input.is_action_just_pressed("Jump") or
