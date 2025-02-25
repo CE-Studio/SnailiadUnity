@@ -1,28 +1,6 @@
 extends Player
 
 
-enum AnimStates {
-	IDLE,
-	WALK,
-	TURNGROUND,
-	JUMP,
-	TURNJUMP,
-	FALL,
-	TURNFALL,
-	LAND,
-	GRAVFLIPLEFT,
-	GRAVFLIPRIGHT,
-	GRAVFLIPUP,
-	SHELL,
-	UNSHELL,
-	SHOOT,
-	SHOCKCHARGE,
-	SHOCKRELEASE,
-	SHOCKLAND,
-}
-var current_state:AnimStates = AnimStates.IDLE
-
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	super()
@@ -63,19 +41,9 @@ func _ready():
 	damage_multiplier = 1
 	health_gain_from_parry = 4
 	
-	sprite.action = "0.ground.right.idle"
+	sprite.action = "0.floor.right.idle"
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	super(delta)
-	
-	var action_name = "0.ground."
-	action_name += "left" if facing_left else "right"
-	if anim_turnaround:
-		action_name += ".turnground"
-	else:
-		action_name += ".shell" if shelled else ".idle"
-	if sprite.action != action_name:
-		sprite.action = action_name
-	anim_turnaround = false

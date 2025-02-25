@@ -1,7 +1,7 @@
 {
 	"tiles": [12, 4],
 	"animations": {
-		"0.ground.right.idle": {
+		"0.floor.right.idle": {
 			"fps": 3,
 			"loop": true,
 			"loop_point": 0,
@@ -11,7 +11,7 @@
 				[1, 0, false, false]
 			]
 		},
-		"0.ground.left.idle": {
+		"0.floor.left.idle": {
 			"fps": 3,
 			"loop": true,
 			"loop_point": 0,
@@ -21,27 +21,27 @@
 				[1, 0, true, false]
 			]
 		},
-		"0.ground.right.turnground": {
+		"0.floor.right.turnground": {
 			"fps": 1,
 			"loop": false,
 			"loop_point": 0,
+			"autoplay_next": "0.floor.right.idle",
 			"randomize_start": false,
 			"frames": [
 				[2, 0, false, false]
-			],
-			"autoplay_next": "0.ground.right.idle"
+			]
 		},
-		"0.ground.left.turnground": {
+		"0.floor.left.turnground": {
 			"fps": 1,
 			"loop": false,
 			"loop_point": 0,
+			"autoplay_next": "0.floor.left.idle",
 			"randomize_start": false,
 			"frames": [
 				[2, 0, true, false]
-			],
-			"autoplay_next": "0.ground.left.idle"
+			]
 		},
-		"0.ground.right.shell": {
+		"0.floor.right.shell": {
 			"fps": 1,
 			"loop": false,
 			"loop_point": 0,
@@ -50,7 +50,7 @@
 				[3, 0, false, false]
 			]
 		},
-		"0.ground.left.shell": {
+		"0.floor.left.shell": {
 			"fps": 1,
 			"loop": false,
 			"loop_point": 0,
