@@ -162,21 +162,18 @@ func _process(delta: float) -> void:
 		var _fps:float = _action["fps"]
 		var _frames:Array = _action["frames"]
 		var _frametime = 1 / _fps
+		if (_frames.size() == 0):
+			if _action.has("autoplay_next"):
+				action = _action["autoplay_next"]
+			else:
+				action = "__NONE__"
+			return
 		if (_timer >= _frametime) or (_timer < -1):
 			if _timer < -1:
 				_timer = 0
 			else:
 				_timer -= _frametime
-			var frame = _frames[_index]
-			if min(frame[0], frame[1]) < 0:
-				hide()
-			else:
-				show()
-				frame_coords = Vector2i(frame[0], frame[1])
-			flip_h = frame[2]
-			flip_v = frame[3]
-			_index += 1
-			if _index >= _frames.size():
+			if _index > _frames.size() - 1:
 				if _action["loop"]:
 					if _action.has("loop_point"):
 						_index = int(_action["loop_point"])
@@ -188,3 +185,12 @@ func _process(delta: float) -> void:
 				else:
 					action = "__NONE__"
 					return
+			var frame = _frames[_index]
+			if min(frame[0], frame[1]) < 0:
+				hide()
+			else:
+				show()
+				frame_coords = Vector2i(frame[0], frame[1])
+			flip_h = frame[2]
+			flip_v = frame[3]
+			_index += 1
