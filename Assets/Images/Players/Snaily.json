@@ -27,9 +27,7 @@
 			"loop_point": 0,
 			"autoplay_next": "0.floor.right.idle",
 			"randomize_start": false,
-			"frames": [
-				[2, 0, false, false]
-			]
+			"frames": [ ]
 		},
 		"0.floor.left.turnground": {
 			"fps": 1,
@@ -37,9 +35,79 @@
 			"loop_point": 0,
 			"autoplay_next": "0.floor.left.idle",
 			"randomize_start": false,
+			"frames": [ ]
+		},
+		"0.floor.right.jump": {
+			"fps": 3,
+			"loop": true,
+			"loop_point": 0,
+			"randomize_start": true,
 			"frames": [
-				[2, 0, true, false]
+				[0, 0, false, false],
+				[1, 0, false, false]
 			]
+		},
+		"0.floor.left.jump": {
+			"fps": 3,
+			"loop": true,
+			"loop_point": 0,
+			"randomize_start": true,
+			"frames": [
+				[0, 0, true, false],
+				[1, 0, true, false]
+			]
+		},
+		"0.floor.right.turnjump": {
+			"fps": 1,
+			"loop": false,
+			"loop_point": 0,
+			"autoplay_next": "0.floor.right.jump",
+			"randomize_start": false,
+			"frames": [ ]
+		},
+		"0.floor.left.turnjump": {
+			"fps": 1,
+			"loop": false,
+			"loop_point": 0,
+			"autoplay_next": "0.floor.left.jump",
+			"randomize_start": false,
+			"frames": [ ]
+		},
+		"0.floor.right.fall": {
+			"fps": 3,
+			"loop": true,
+			"loop_point": 0,
+			"randomize_start": true,
+			"frames": [
+				[0, 0, false, false],
+				[1, 0, false, false]
+			]
+		},
+		"0.floor.left.fall": {
+			"fps": 3,
+			"loop": true,
+			"loop_point": 0,
+			"randomize_start": true,
+			"frames": [
+				[0, 0, true, false],
+				[1, 0, true, false]
+			]
+		},
+		"0.floor.right.turnfall": {
+			"fps": 1,
+			"loop": false,
+			"loop_point": 0,
+			"autoplay_next": "0.floor.right.fall",
+			"randomize_start": false,
+			"frames": [ ]
+		},
+		"0.floor.left.turnfall": {
+			"fps": 1,
+			"loop": false,
+			"loop_point": 0,
+			"autoplay_next": "0.floor.left.fall",
+			"randomize_start": false,
+			"frames": [ ]
 		},
 		"0.floor.right.shell": {
 			"fps": 1,
@@ -58,6 +126,38 @@
 			"frames": [
 				[3, 0, true, false]
 			]
+		},
+		"0.floor.right.turnshell": {
+			"fps": 1,
+			"loop": false,
+			"loop_point": 0,
+			"autoplay_next": "0.floor.right.shell",
+			"randomize_start": false,
+			"frames": [ ]
+		},
+		"0.floor.left.turnshell": {
+			"fps": 1,
+			"loop": false,
+			"loop_point": 0,
+			"autoplay_next": "0.floor.left.shell",
+			"randomize_start": false,
+			"frames": [ ]
+		},
+		"0.floor.right.unshell": {
+			"fps": 1,
+			"loop": false,
+			"loop_point": 0,
+			"autoplay_next": "0.floor.right.idle",
+			"randomize_start": false,
+			"frames": [ ]
+		},
+		"0.floor.left.unshell": {
+			"fps": 1,
+			"loop": false,
+			"loop_point": 0,
+			"autoplay_next": "0.floor.left.idle",
+			"randomize_start": false,
+			"frames": [ ]
 		}
 	}
 }

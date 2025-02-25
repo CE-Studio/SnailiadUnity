@@ -280,12 +280,14 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 	var rel_axis:Vector2
 	var rel_vel:Vector2
 	var rel_down_pressed:bool
+	var rel_right:Vector2
 	var remapped_dirs:Array
 	match surface:
 		Statics.DirsSurface.FLOOR:
 			rel_axis = Vector2(input_axis_x, input_axis_y)
 			rel_vel = Vector2(body.velocity.x, body.velocity.y)
 			rel_down_pressed = Input.is_action_just_pressed("Down")
+			rel_right = Vector2.RIGHT
 			remapped_dirs = [
 				Statics.DirsSurface.FLOOR,
 				Statics.DirsSurface.LWALL,
@@ -293,9 +295,10 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 				Statics.DirsSurface.CEILING
 			]
 		Statics.DirsSurface.LWALL:
-			rel_axis = Vector2(input_axis_y, -input_axis_x)
-			rel_vel = Vector2(body.velocity.y, -body.velocity.x)
+			rel_axis = Vector2(input_axis_y, input_axis_x)
+			rel_vel = Vector2(body.velocity.y, body.velocity.x)
 			rel_down_pressed = Input.is_action_just_pressed("Left")
+			rel_right = Vector2.DOWN
 			remapped_dirs = [
 				Statics.DirsSurface.LWALL,
 				Statics.DirsSurface.CEILING,
@@ -303,9 +306,10 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 				Statics.DirsSurface.RWALL
 			]
 		Statics.DirsSurface.RWALL:
-			rel_axis = Vector2(-input_axis_y, input_axis_x)
-			rel_vel = Vector2(-body.velocity.y, body.velocity.x)
+			rel_axis = Vector2(-input_axis_y, -input_axis_x)
+			rel_vel = Vector2(-body.velocity.y, -body.velocity.x)
 			rel_down_pressed = Input.is_action_just_pressed("Right")
+			rel_right = Vector2.UP
 			remapped_dirs = [
 				Statics.DirsSurface.RWALL,
 				Statics.DirsSurface.FLOOR,
@@ -316,6 +320,7 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 			rel_axis = Vector2(-input_axis_x, -input_axis_y)
 			rel_vel = Vector2(-body.velocity.x, -body.velocity.y)
 			rel_down_pressed = Input.is_action_just_pressed("Up")
+			rel_right = Vector2.LEFT
 			remapped_dirs = [
 				Statics.DirsSurface.CEILING,
 				Statics.DirsSurface.RWALL,
@@ -340,24 +345,58 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 				_play_anim("turnfall")
 			AnimStates.SHELL:
 				_play_anim("turnshell")
+		if shelled and not grounded:
+			var adjust_amount = unshell_adjust
+			if facing_left:
+				adjust_amount = -adjust_amount
+			body.translate(rel_right * adjust_amount)
+	
 	if body.is_on_floor():
 		grounded = true
+		var unshell_on_jump:bool = false
 		if (Input.is_action_just_pressed("Jump") or
 		(Input.is_action_pressed("Jump") and (jump_buffer_counter < jump_buffer))):
 			rel_vel.y = jump_power[read_i_jump] * jump_mod
 			grounded = false
 			sfx_jump.play()
-		if rel_vel.x != 0.0 and shelled:
+			current_state = AnimStates.JUMP
+			_play_anim("jump")
+			if shelled:
+				unshell_on_jump = true
+		if (rel_vel.x != 0.0 and shelled) or unshell_on_jump:
 			_toggle_shell()
+			if current_state != AnimStates.JUMP:
+				current_state = AnimStates.IDLE
 	else:
 		rel_vel.y += gravity[read_i_jump] * gravity_mod
 		if rel_vel.y < 0.0 and not Input.is_action_pressed("Jump"):
 			rel_vel.y = Statics.integrate(rel_vel.y, 0.0, jump_floatiness[read_i_speed], delta)
 		rel_vel.y = clampf(rel_vel.y, -INF, terminal_velocity[read_i_jump])
+		if (rel_vel.y > 0.0 and
+		(current_state == AnimStates.IDLE or current_state == AnimStates.JUMP)):
+			current_state = AnimStates.FALL
+			_play_anim("fall")
 		if Input.is_action_just_pressed("Jump") and (coyote_time_counter < coyote_time):
 			rel_vel.y = jump_power[read_i_jump] * jump_mod
 			grounded = false
 			sfx_jump.play()
+			current_state = AnimStates.JUMP
+			_play_anim("jump")
+	
+	if body.is_on_wall():
+		if (rel_axis.y < 0.0 or (rel_axis.y > 0.0 and not grounded)
+		and _check_ability(can_swap_gravity) and _check_ability(can_round_inner_corners)):
+			var new_gravity
+			if facing_left:
+				new_gravity = _get_dir_adjacent_cw(gravity_dir)
+			else:
+				new_gravity = _get_dir_adjacent_ccw(gravity_dir)
+			var new_left
+			if rel_axis.y < 0.0:
+				new_left = facing_left
+			else:
+				new_left = not facing_left
+			_set_direction(new_gravity, new_left)
 	
 	if rel_down_pressed and rel_vel.x == 0 and _check_ability(shellable):
 		_toggle_shell()
@@ -367,9 +406,9 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 		Statics.DirsSurface.FLOOR:
 			body.velocity = rel_vel
 		Statics.DirsSurface.LWALL:
-			body.velocity = Vector2(rel_vel.y, -rel_vel.x)
+			body.velocity = Vector2(rel_vel.y, rel_vel.x)
 		Statics.DirsSurface.RWALL:
-			body.velocity = Vector2(-rel_vel.y, rel_vel.x)
+			body.velocity = Vector2(-rel_vel.y, -rel_vel.x)
 		Statics.DirsSurface.CEILING:
 			body.velocity = -rel_vel
 	#endregion
@@ -404,12 +443,16 @@ func _set_direction(surface:Statics.DirsSurface, flipped:bool, set_home:bool = f
 	match surface:
 		Statics.DirsSurface.FLOOR:
 			body.set_deferred("rotation_degrees", 0.0)
+			body.up_direction = Vector2.UP
 		Statics.DirsSurface.LWALL:
 			body.set_deferred("rotation_degrees", 90.0)
+			body.up_direction = Vector2.RIGHT
 		Statics.DirsSurface.CEILING:
 			body.set_deferred("rotation_degrees", 180.0)
+			body.up_direction = Vector2.LEFT
 		Statics.DirsSurface.RWALL:
 			body.set_deferred("rotation_degrees", 270.0)
+			body.up_direction = Vector2.DOWN
 	body.set_deferred("scale", Vector2(-1 if flipped else 1, 1))
 
 
@@ -423,7 +466,10 @@ func _set_shell(state:bool):
 	box_shell.set_deferred("disabled", not state)
 	if state:
 		sfx_shell.play()
-		
+		_play_anim("shell")
+		current_state = AnimStates.SHELL
+	else:
+		_play_anim("unshell")
 
 
 func _play_anim(action:String):
@@ -449,6 +495,48 @@ func _play_anim(action:String):
 	if sprite.action != full_action:
 		sprite.action = full_action
 	print(full_action)
+
+
+func _get_dir_adjacent_cw(old_dir:Statics.DirsSurface) -> Statics.DirsSurface:
+	var new_dir
+	match old_dir:
+		Statics.DirsSurface.FLOOR:
+			new_dir = Statics.DirsSurface.LWALL
+		Statics.DirsSurface.LWALL:
+			new_dir = Statics.DirsSurface.CEILING
+		Statics.DirsSurface.RWALL:
+			new_dir = Statics.DirsSurface.FLOOR
+		Statics.DirsSurface.CEILING:
+			new_dir = Statics.DirsSurface.RWALL
+	return new_dir
+
+
+func _get_dir_adjacent_ccw(old_dir:Statics.DirsSurface) -> Statics.DirsSurface:
+	var new_dir
+	match old_dir:
+		Statics.DirsSurface.FLOOR:
+			new_dir = Statics.DirsSurface.RWALL
+		Statics.DirsSurface.LWALL:
+			new_dir = Statics.DirsSurface.FLOOR
+		Statics.DirsSurface.RWALL:
+			new_dir = Statics.DirsSurface.CEILING
+		Statics.DirsSurface.CEILING:
+			new_dir = Statics.DirsSurface.LWALL
+	return new_dir
+
+
+func _get_dir_opposite(old_dir:Statics.DirsSurface) -> Statics.DirsSurface:
+	var new_dir
+	match old_dir:
+		Statics.DirsSurface.FLOOR:
+			new_dir = Statics.DirsSurface.CEILING
+		Statics.DirsSurface.LWALL:
+			new_dir = Statics.DirsSurface.RWALL
+		Statics.DirsSurface.RWALL:
+			new_dir = Statics.DirsSurface.LWALL
+		Statics.DirsSurface.CEILING:
+			new_dir = Statics.DirsSurface.FLOOR
+	return new_dir
 
 
 #region Cutscene functions
