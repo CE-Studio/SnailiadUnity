@@ -23,6 +23,7 @@ var stunned:bool
 var in_death_cutscene:bool
 var underwater:bool
 var velocity:Vector2
+var last_rel_vel:Vector2
 var grounded:bool
 var grounded_last_frame:bool
 var shelled:bool
@@ -134,6 +135,24 @@ var damage_multiplier:float
 # A fractional multiplier applied to any damage taken to increase/decrease characters' defense
 var health_gain_from_parry:int
 # How much health you recover from a Perfect Parry
+#endregion
+
+
+#region Animation control
+var anim_move_toggle:bool = false
+var anim_turnaround:bool = false
+var anim_ground_toggle:bool = false
+var anim_shell_toggle:bool = false
+
+
+enum AnimStates {
+	IDLE,
+	WALK,
+	JUMP,
+	FALL,
+	SHELL,
+}
+var current_state:AnimStates = AnimStates.IDLE
 #endregion
 
 
@@ -303,12 +322,24 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 				Statics.DirsSurface.LWALL,
 				Statics.DirsSurface.FLOOR
 			]
+	last_rel_vel = rel_vel
 	#endregion
 	
 	rel_vel.x = rel_axis.x * run_speed[read_i_speed] * speed_mod
 	if ((rel_axis.x < 0.0 and not facing_left) or
 	(rel_axis.x > 0.0 and facing_left)):
 		_set_direction(remapped_dirs[Statics.DirsSurface.FLOOR], not facing_left)
+		match current_state:
+			AnimStates.IDLE:
+				_play_anim("turnground")
+			AnimStates.WALK:
+				_play_anim("turnground")
+			AnimStates.JUMP:
+				_play_anim("turnjump")
+			AnimStates.FALL:
+				_play_anim("turnfall")
+			AnimStates.SHELL:
+				_play_anim("turnshell")
 	if body.is_on_floor():
 		grounded = true
 		if (Input.is_action_just_pressed("Jump") or
@@ -352,6 +383,7 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 			body.velocity.x = 0.0
 		if body.is_on_floor():
 			grounded = true
+			anim_ground_toggle = true
 #endregion
 
 
@@ -391,6 +423,32 @@ func _set_shell(state:bool):
 	box_shell.set_deferred("disabled", not state)
 	if state:
 		sfx_shell.play()
+		
+
+
+func _play_anim(action:String):
+	var full_action = ""
+	
+	full_action += "0."
+	
+	match gravity_dir:
+		Statics.DirsSurface.FLOOR:
+			full_action += "floor."
+			full_action += "left." if facing_left else "right."
+		Statics.DirsSurface.LWALL:
+			full_action += "lwall."
+			full_action += "up." if facing_left else "down."
+		Statics.DirsSurface.RWALL:
+			full_action += "rwall."
+			full_action += "right." if facing_left else "left."
+		Statics.DirsSurface.CEILING:
+			full_action += "ceiling."
+			full_action += "down." if facing_left else "up."
+	
+	full_action += action
+	if sprite.action != full_action:
+		sprite.action = full_action
+	print(full_action)
 
 
 #region Cutscene functions

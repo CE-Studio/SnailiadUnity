@@ -41,15 +41,9 @@ func _ready():
 	damage_multiplier = 1
 	health_gain_from_parry = 4
 	
-	sprite.action = "0.ground.right.idle"
+	sprite.action = "0.floor.right.idle"
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	super(delta)
-	
-	var action_name = "0.ground."
-	action_name += "left" if facing_left else "right"
-	action_name += ".shell" if shelled else ".idle"
-	if sprite.action != action_name:
-		sprite.action = action_name
