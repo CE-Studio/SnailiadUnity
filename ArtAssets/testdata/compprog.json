@@ -1,0 +1,19 @@
+[
+	{
+		"n": "PLAYER",
+		".": {
+			"n": "setFreeze",
+			"()": [
+				{
+					"n": "true",
+				},
+				{
+					"n": "conditions",
+					".": {
+						"n": "ALWAYS"
+					}
+				}
+			]
+		}
+	}
+]
