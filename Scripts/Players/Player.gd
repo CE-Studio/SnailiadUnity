@@ -139,12 +139,6 @@ var health_gain_from_parry:int
 
 
 #region Animation control
-var anim_move_toggle:bool = false
-var anim_turnaround:bool = false
-var anim_ground_toggle:bool = false
-var anim_shell_toggle:bool = false
-
-
 enum AnimStates {
 	IDLE,
 	WALK,
@@ -162,6 +156,7 @@ var box_normal:CollisionShape2D
 var box_shell:CollisionShape2D
 var sfx_jump:AudioStreamPlayer
 var sfx_shell:AudioStreamPlayer
+var cast_group:Node2D
 
 
 # _ready() is called every time this script is instanced
@@ -177,6 +172,7 @@ func _ready():
 	box_shell.set_deferred("disabled", true)
 	sfx_jump = $"AudioGroup/Jump"
 	sfx_shell = $"AudioGroup/Shell"
+	cast_group = $"CastGroup"
 
 
 # _process() is called every frame and is used to update various timers and equipped weaponry
@@ -280,14 +276,19 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 	var rel_axis:Vector2
 	var rel_vel:Vector2
 	var rel_down_pressed:bool
-	var rel_right:Vector2
+	var rel_vectors:Array
 	var remapped_dirs:Array
 	match surface:
 		Statics.DirsSurface.FLOOR:
 			rel_axis = Vector2(input_axis_x, input_axis_y)
 			rel_vel = Vector2(body.velocity.x, body.velocity.y)
 			rel_down_pressed = Input.is_action_just_pressed("Down")
-			rel_right = Vector2.RIGHT
+			rel_vectors = [
+				Vector2.DOWN,
+				Vector2.LEFT,
+				Vector2.RIGHT,
+				Vector2.UP
+			]
 			remapped_dirs = [
 				Statics.DirsSurface.FLOOR,
 				Statics.DirsSurface.LWALL,
@@ -295,10 +296,15 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 				Statics.DirsSurface.CEILING
 			]
 		Statics.DirsSurface.LWALL:
-			rel_axis = Vector2(input_axis_y, input_axis_x)
-			rel_vel = Vector2(body.velocity.y, body.velocity.x)
+			rel_axis = Vector2(input_axis_y, -input_axis_x)
+			rel_vel = Vector2(body.velocity.y, -body.velocity.x)
 			rel_down_pressed = Input.is_action_just_pressed("Left")
-			rel_right = Vector2.DOWN
+			rel_vectors = [
+				Vector2.LEFT,
+				Vector2.UP,
+				Vector2.DOWN,
+				Vector2.RIGHT
+			]
 			remapped_dirs = [
 				Statics.DirsSurface.LWALL,
 				Statics.DirsSurface.CEILING,
@@ -306,10 +312,15 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 				Statics.DirsSurface.RWALL
 			]
 		Statics.DirsSurface.RWALL:
-			rel_axis = Vector2(-input_axis_y, -input_axis_x)
-			rel_vel = Vector2(-body.velocity.y, -body.velocity.x)
+			rel_axis = Vector2(-input_axis_y, input_axis_x)
+			rel_vel = Vector2(-body.velocity.y, body.velocity.x)
 			rel_down_pressed = Input.is_action_just_pressed("Right")
-			rel_right = Vector2.UP
+			rel_vectors = [
+				Vector2.RIGHT,
+				Vector2.DOWN,
+				Vector2.UP,
+				Vector2.LEFT
+			]
 			remapped_dirs = [
 				Statics.DirsSurface.RWALL,
 				Statics.DirsSurface.FLOOR,
@@ -320,7 +331,12 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 			rel_axis = Vector2(-input_axis_x, -input_axis_y)
 			rel_vel = Vector2(-body.velocity.x, -body.velocity.y)
 			rel_down_pressed = Input.is_action_just_pressed("Up")
-			rel_right = Vector2.LEFT
+			rel_vectors = [
+				Vector2.UP,
+				Vector2.RIGHT,
+				Vector2.LEFT,
+				Vector2.DOWN
+			]
 			remapped_dirs = [
 				Statics.DirsSurface.CEILING,
 				Statics.DirsSurface.RWALL,
@@ -331,6 +347,12 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 	#endregion
 	
 	rel_vel.x = rel_axis.x * run_speed[read_i_speed] * speed_mod
+	if rel_axis.x != 0.0 and grounded and current_state != AnimStates.WALK:
+		current_state = AnimStates.WALK
+		_play_anim("walk")
+	if rel_axis.x == 0.0 and grounded and current_state == AnimStates.WALK:
+		current_state = AnimStates.IDLE
+		_play_anim("idle")
 	if ((rel_axis.x < 0.0 and not facing_left) or
 	(rel_axis.x > 0.0 and facing_left)):
 		_set_direction(remapped_dirs[Statics.DirsSurface.FLOOR], not facing_left)
@@ -349,7 +371,7 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 			var adjust_amount = unshell_adjust
 			if facing_left:
 				adjust_amount = -adjust_amount
-			body.translate(rel_right * adjust_amount)
+			body.translate(rel_vectors[Statics.DirsSurface.RWALL] * adjust_amount)
 	
 	if body.is_on_floor():
 		grounded = true
@@ -383,7 +405,7 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 			current_state = AnimStates.JUMP
 			_play_anim("jump")
 	
-	if body.is_on_wall():
+	if body.is_on_wall() and rel_axis.x != 0.0:
 		if (rel_axis.y < 0.0 or (rel_axis.y > 0.0 and not grounded)
 		and _check_ability(can_swap_gravity) and _check_ability(can_round_inner_corners)):
 			var new_gravity
@@ -397,6 +419,12 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 			else:
 				new_left = not facing_left
 			_set_direction(new_gravity, new_left)
+			var rect = box_normal.shape.get_rect()
+			var box_difference = rect.size.x - rect.size.y
+			var rel_against_wall = Statics.DirsSurface.LWALL if facing_left else Statics.DirsSurface.RWALL
+			body.translate(rel_vectors[rel_against_wall] * box_difference)
+			current_state = AnimStates.WALK
+			_play_anim("walk" if grounded else "land")
 	
 	if rel_down_pressed and rel_vel.x == 0 and _check_ability(shellable):
 		_toggle_shell()
@@ -406,9 +434,9 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 		Statics.DirsSurface.FLOOR:
 			body.velocity = rel_vel
 		Statics.DirsSurface.LWALL:
-			body.velocity = Vector2(rel_vel.y, rel_vel.x)
+			body.velocity = Vector2(-rel_vel.y, rel_vel.x)
 		Statics.DirsSurface.RWALL:
-			body.velocity = Vector2(-rel_vel.y, -rel_vel.x)
+			body.velocity = Vector2(rel_vel.y, -rel_vel.x)
 		Statics.DirsSurface.CEILING:
 			body.velocity = -rel_vel
 	#endregion
@@ -422,7 +450,14 @@ func _case_default(delta:float, surface:Statics.DirsSurface):
 			body.velocity.x = 0.0
 		if body.is_on_floor():
 			grounded = true
-			anim_ground_toggle = true
+			current_state = AnimStates.IDLE
+			_play_anim("land")
+		elif rel_axis.y < 0.0 and _check_ability(can_swap_gravity):
+			grounded = true
+			_set_direction(_get_dir_opposite(surface), facing_left)
+			current_state = AnimStates.IDLE if rel_axis.x == 0.0 else AnimStates.WALK
+			_play_anim("land")
+			# Broken! Fix this
 #endregion
 
 
@@ -443,17 +478,22 @@ func _set_direction(surface:Statics.DirsSurface, flipped:bool, set_home:bool = f
 	match surface:
 		Statics.DirsSurface.FLOOR:
 			body.set_deferred("rotation_degrees", 0.0)
-			body.up_direction = Vector2.UP
+			body.set_deferred("up_direction", Vector2.UP)
+			cast_group.set_deferred("rotation_degrees", 0.0)
 		Statics.DirsSurface.LWALL:
 			body.set_deferred("rotation_degrees", 90.0)
-			body.up_direction = Vector2.RIGHT
+			body.set_deferred("up_direction", Vector2.RIGHT)
+			cast_group.set_deferred("rotation_degrees", 90.0)
 		Statics.DirsSurface.CEILING:
 			body.set_deferred("rotation_degrees", 180.0)
-			body.up_direction = Vector2.LEFT
+			body.set_deferred("up_direction", Vector2.DOWN)
+			cast_group.set_deferred("rotation_degrees", 180.0)
 		Statics.DirsSurface.RWALL:
 			body.set_deferred("rotation_degrees", 270.0)
-			body.up_direction = Vector2.DOWN
+			body.set_deferred("up_direction", Vector2.LEFT)
+			cast_group.set_deferred("rotation_degrees", 270.0)
 	body.set_deferred("scale", Vector2(-1 if flipped else 1, 1))
+	cast_group.set_deferred("scale", Vector2(-1 if flipped else 1, 1))
 
 
 func _toggle_shell():
@@ -480,16 +520,17 @@ func _play_anim(action:String):
 	match gravity_dir:
 		Statics.DirsSurface.FLOOR:
 			full_action += "floor."
-			full_action += "left." if facing_left else "right."
+			#full_action += "left." if facing_left else "right."
 		Statics.DirsSurface.LWALL:
 			full_action += "lwall."
-			full_action += "up." if facing_left else "down."
+			#full_action += "up." if facing_left else "down."
 		Statics.DirsSurface.RWALL:
 			full_action += "rwall."
-			full_action += "right." if facing_left else "left."
+			#full_action += "right." if facing_left else "left."
 		Statics.DirsSurface.CEILING:
 			full_action += "ceiling."
-			full_action += "down." if facing_left else "up."
+			#full_action += "down." if facing_left else "up."
+	full_action += "left." if facing_left else "right."
 	
 	full_action += action
 	if sprite.action != full_action:
